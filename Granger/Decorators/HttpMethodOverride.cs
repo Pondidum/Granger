@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 using Microsoft.Owin;
 
 namespace Granger.Decorators
@@ -9,9 +11,17 @@ namespace Granger.Decorators
 		{
 		}
 
-		public override Task Invoke(IOwinContext context)
+		public override async Task Invoke(IOwinContext context)
 		{
-			throw new System.NotImplementedException();
+			if (context.Request.Method == HttpMethod.Post.Method)
+				context.Request.Method = context
+					.Request
+					.Query
+					.GetValues("_method")
+					.DefaultIfEmpty(HttpMethod.Post.Method)
+					.First();
+
+			await Next.Invoke(context);
 		}
 	}
 }
