@@ -5,10 +5,11 @@ An OWIN based REST and JSON support library.
 * [ ] Collection query parameters
   * [ ] finds collections in json responses
   * [ ] `?start=`, `?limit=`
-* [ ] HTTP Method overrides
-  * [ ] applies only to POST
-  * [ ] `?_method=PUT`
-  * [ ] `?_method=DELETE`
+* [x] HTTP Method overrides
+  * [x] applies only to POST
+  * [x] `?_method=PUT`
+  * [x] `?_method=DELETE`
+  * [x] whitelist of allowed method overrides
 * [ ] Conformity Checker
   * [ ] checks all urls are on an "href" key
   * [ ] expand to check responses?
