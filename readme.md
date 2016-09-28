@@ -2,9 +2,9 @@
 An OWIN based REST and JSON support library.
 
 ## Route decorators
-* [ ] Collection query parameters
-  * [ ] finds collections in json responses
-  * [ ] `?start=`, `?limit=`
+* [x] Collection query parameters
+  * [x] finds collections in json responses
+  * [x] `?start=`, `?limit=`
 * [x] HTTP Method overrides
   * [x] applies only to POST
   * [x] `?_method=PUT`
