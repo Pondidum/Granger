@@ -2,9 +2,9 @@
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Granger.Decorators;
 using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Newtonsoft.Json;
@@ -27,6 +27,7 @@ namespace Granger.Tests.Decorators
 		{
 			_server = TestServer.Create(app =>
 			{
+				app.Use<CollectionRangeMiddleware>();
 				app.Run(async context =>
 				{
 					handle(context.Request, context.Response);
