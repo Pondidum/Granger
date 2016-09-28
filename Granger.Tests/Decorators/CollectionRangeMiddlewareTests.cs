@@ -19,18 +19,14 @@ namespace Granger.Tests.Decorators
 		private TestServer _server;
 		private IOwinResponse _response;
 
-		public CollectionRangeMiddlewareTests()
-		{
-		}
-
-		private void CreateServer(Action<IOwinRequest, IOwinResponse> handle)
+		private void CreateServer(Action<IOwinResponse> handle)
 		{
 			_server = TestServer.Create(app =>
 			{
 				app.Use<CollectionRangeMiddleware>();
 				app.Run(async context =>
 				{
-					handle(context.Request, context.Response);
+					handle(context.Response);
 					_response = context.Response;
 					await Task.Yield();
 				});
@@ -42,7 +38,7 @@ namespace Granger.Tests.Decorators
 		{
 			var xml = "<collection><item /><item /><item /></collection>";
 
-			CreateServer((req, res) =>
+			CreateServer(res =>
 			{
 				res.Headers[HttpResponseHeader.ContentType.ToString()]= "text/xml";
 				res.Body = StreamFromString(xml);
@@ -59,7 +55,7 @@ namespace Granger.Tests.Decorators
 		{
 			var json = JsonConvert.SerializeObject(new { name = "Andy", age = 30 });
 
-			CreateServer((req, res) => ReturnJson(res, json));
+			CreateServer(res => ReturnJson(res, json));
 
 			await _server.CreateRequest("resource?start=0&limit=10").GetAsync();
 
@@ -72,7 +68,7 @@ namespace Granger.Tests.Decorators
 		{
 			var json = JsonConvert.SerializeObject(Enumerable.Range(0, 7));
 
-			CreateServer((req, res) => ReturnJson(res, json));
+			CreateServer(res => ReturnJson(res, json));
 
 			await _server.CreateRequest("resource?start=0&limit=10").GetAsync();
 
@@ -85,7 +81,7 @@ namespace Granger.Tests.Decorators
 		{
 			var collection = Enumerable.Range(0, 20);
 
-			CreateServer((req, res) => ReturnJson(res, JsonConvert.SerializeObject(collection)));
+			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
 			await _server.CreateRequest("resource").GetAsync();
 
@@ -98,7 +94,7 @@ namespace Granger.Tests.Decorators
 		{
 			var collection = Enumerable.Range(0, 20);
 
-			CreateServer((req, res) => ReturnJson(res, JsonConvert.SerializeObject(collection)));
+			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
 			await _server.CreateRequest("resource?start=-40&limit=10").GetAsync();
 
@@ -111,7 +107,7 @@ namespace Granger.Tests.Decorators
 		{
 			var collection = Enumerable.Range(0, 20);
 
-			CreateServer((req, res) => ReturnJson(res, JsonConvert.SerializeObject(collection)));
+			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
 			await _server.CreateRequest("resource?start=0&limit=-5").GetAsync();
 
@@ -124,7 +120,7 @@ namespace Granger.Tests.Decorators
 		{
 			var collection = Enumerable.Range(0, 20);
 
-			CreateServer((req, res) => ReturnJson(res, JsonConvert.SerializeObject(collection)));
+			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
 			await _server.CreateRequest("resource?start=5&limit=10").GetAsync();
 
@@ -137,7 +133,7 @@ namespace Granger.Tests.Decorators
 		{
 			var collection = Enumerable.Range(0, 20);
 
-			CreateServer((req, res) => ReturnJson(res, JsonConvert.SerializeObject(collection)));
+			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
 			await _server.CreateRequest("resource?start=50&limit=10").GetAsync();
 
