@@ -13,8 +13,17 @@ namespace Granger.Decorators
 	{
 		public const int DefaultPageSize = 10;
 
-		public CollectionRangeMiddleware(OwinMiddleware next) : base(next)
+		private readonly int _pageSize;
+
+		// ReSharper disable once IntroduceOptionalParameters.Global
+		// As this is an owin middleware, you cannot use optional paramters for the ctor
+		public CollectionRangeMiddleware(OwinMiddleware next) : this(next, DefaultPageSize)
 		{
+		}
+
+		public CollectionRangeMiddleware(OwinMiddleware next, int pageSize) : base(next)
+		{
+			_pageSize = pageSize;
 		}
 
 		public override async Task Invoke(IOwinContext context)
@@ -31,7 +40,7 @@ namespace Granger.Decorators
 			if (jo.Type == JTokenType.Array)
 			{
 				var start = GetOrDefault(context.Request, "start", 0);
-				var limit = GetOrDefault(context.Request, "limit", DefaultPageSize);
+				var limit = GetOrDefault(context.Request, "limit", _pageSize);
 
 				var chopped = jo.Skip(start).Take(limit);
 

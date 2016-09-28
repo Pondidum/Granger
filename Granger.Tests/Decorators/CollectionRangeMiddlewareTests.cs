@@ -33,6 +33,21 @@ namespace Granger.Tests.Decorators
 			});
 		}
 
+		private void CreateServerWithPageSize(int pageSize, Action<IOwinResponse> handle)
+		{
+			_server = TestServer.Create(app =>
+			{
+				app.Use<CollectionRangeMiddleware>(pageSize);
+				app.Run(async context =>
+				{
+					handle(context.Response);
+					_response = context.Response;
+					await Task.Yield();
+				});
+			});
+		}
+
+
 		[Fact]
 		public async Task When_the_response_is_not_json()
 		{
@@ -139,6 +154,19 @@ namespace Granger.Tests.Decorators
 
 			StringFromStream(_response.Body)
 				.ShouldBe(JsonConvert.SerializeObject(Enumerable.Empty<int>()));
+		}
+
+		[Fact]
+		public async Task When_a_custom_page_size_is_used()
+		{
+			var collection = Enumerable.Range(0, 20);
+
+			CreateServerWithPageSize(7, res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
+
+			await _server.CreateRequest("resource?start=5").GetAsync();
+
+			StringFromStream(_response.Body)
+				.ShouldBe(JsonConvert.SerializeObject(collection.Skip(5).Take(7)));
 		}
 
 		private static void ReturnJson(IOwinResponse res, string json)
