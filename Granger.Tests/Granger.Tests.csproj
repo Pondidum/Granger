@@ -85,6 +85,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Decorators\CollectionRangeMiddlewareTests.cs" />
+    <Compile Include="Decorators\ConformityCheckerTests.cs" />
     <Compile Include="Decorators\HttpMethodOverrideTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
