@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
 using Microsoft.Owin;
 
 namespace Granger.Decorators
@@ -9,9 +11,17 @@ namespace Granger.Decorators
 		{
 		}
 
-		public override Task Invoke(IOwinContext context)
+		public override async Task Invoke(IOwinContext context)
 		{
-			throw new System.NotImplementedException();
+			await Next.Invoke(context);
+
+			var request = context.Request;
+			var headers = request.Headers.GetValues(HttpRequestHeader.ContentType.ToString());
+			var contentType = headers?.FirstOrDefault(value => string.IsNullOrWhiteSpace(value) == false);
+
+			if (string.Equals(contentType, "application/json") == false)
+				return;
+
 		}
 	}
 }
