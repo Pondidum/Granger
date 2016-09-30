@@ -3,6 +3,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Granger.Decorators;
 using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Newtonsoft.Json;
@@ -21,6 +22,7 @@ namespace Granger.Tests.Decorators
 		{
 			_server = TestServer.Create(app =>
 			{
+				app.Use<ConformityChecker>();
 				app.Run(async context =>
 				{
 					handle(context.Response);
@@ -104,8 +106,6 @@ namespace Granger.Tests.Decorators
 
 			FromStream(_response.Body).ShouldBe(Json(expectedResponse));
 		}
-
-
 
 		private static string Json(object obj) => JsonConvert.SerializeObject(obj);
 

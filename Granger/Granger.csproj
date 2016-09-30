@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Decorators\CollectionRangeMiddleware.cs" />
+    <Compile Include="Decorators\ConformityChecker.cs" />
     <Compile Include="Decorators\HttpMethodOverride.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
