@@ -35,7 +35,7 @@ namespace Granger.Decorators
 			if (contentType != null && contentType.All(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase) == false))
 				return;
 
-			var jo = ReadJson(context.Response);
+			var jo = context.Response.ReadJson();
 
 			if (jo.Type == JTokenType.Array)
 			{
@@ -44,30 +44,10 @@ namespace Granger.Decorators
 
 				var chopped = jo.Skip(start).Take(limit);
 
-				jo = JToken.FromObject(chopped); ;
+				jo = JToken.FromObject(chopped);
 			}
 
-			context.Response.Body = WriteJson(jo);
-		}
-
-		private static MemoryStream WriteJson(JToken jo)
-		{
-			var ms = new MemoryStream();
-			var streamWriter = new StreamWriter(ms);
-			var writer = new JsonTextWriter(streamWriter);
-
-			jo.WriteTo(writer);
-			writer.Flush();
-			ms.Position = 0;
-
-			return ms;
-		}
-
-		private static JToken ReadJson(IOwinResponse response)
-		{
-			using (var streamReader = new StreamReader(response.Body))
-			using (var jsonReader = new JsonTextReader(streamReader))
-				return JToken.ReadFrom(jsonReader);
+			context.Response.Body = jo.WriteJson();
 		}
 
 		private static int GetOrDefault(IOwinRequest request, string key, int defaultValue)

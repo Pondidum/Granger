@@ -55,6 +55,7 @@
     <Compile Include="Decorators\CollectionRangeMiddleware.cs" />
     <Compile Include="Decorators\ConformityChecker.cs" />
     <Compile Include="Decorators\HttpMethodOverride.cs" />
+    <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
