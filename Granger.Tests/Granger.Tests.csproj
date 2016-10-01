@@ -84,6 +84,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conformity\UrlFinderTests.cs" />
     <Compile Include="Decorators\CollectionRangeMiddlewareTests.cs" />
     <Compile Include="Decorators\ConformityCheckerTests.cs" />
     <Compile Include="Decorators\HttpMethodOverrideTests.cs" />

@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conformity\UrlFinder.cs" />
     <Compile Include="Decorators\CollectionRangeMiddleware.cs" />
     <Compile Include="Decorators\ConformityChecker.cs" />
     <Compile Include="Decorators\HttpMethodOverride.cs" />
