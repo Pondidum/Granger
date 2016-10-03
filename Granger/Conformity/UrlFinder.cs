@@ -9,7 +9,7 @@ namespace Granger.Conformity
 {
 	public class UrlFinder
 	{
-		public IEnumerable<JToken> Execute(JToken token)
+		public virtual IEnumerable<JToken> Execute(JToken token)
 		{
 			var rx = new Regex("^https?://");
 
