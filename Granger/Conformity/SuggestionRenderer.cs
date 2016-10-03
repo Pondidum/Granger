@@ -14,10 +14,10 @@ namespace Granger.Conformity
 			ContractResolver = new CamelCasePropertyNamesContractResolver()
 		};
 
-		public JToken Render(JToken original, ICollection<JToken> toChange)
+		public virtual JToken Render(ICollection<JToken> toChange)
 		{
 			if (toChange.Any() == false)
-				return original;
+				return JToken.FromObject(new ConformityDto(), JsonSerializer.Create(JsonSettings));
 
 			var report = new ConformityDto
 			{
@@ -29,10 +29,7 @@ namespace Granger.Conformity
 				}
 			};
 
-			var result = original.DeepClone();
-			result["__conformity"] = JToken.FromObject(report, JsonSerializer.Create(JsonSettings));
-
-			return result;
+			return JToken.FromObject(report, JsonSerializer.Create(JsonSettings));
 		}
 
 		private class ConformityDto

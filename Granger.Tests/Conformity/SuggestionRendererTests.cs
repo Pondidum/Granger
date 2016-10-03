@@ -25,7 +25,7 @@ namespace Granger.Tests.Conformity
 				location = "http://example.com"
 			});
 
-			var output = _renderer.Render(input, Enumerable.Empty<JToken>().ToList());
+			var output = _renderer.Render(Enumerable.Empty<JToken>().ToList());
 
 			output.ToString().ShouldBe(input.ToString());
 		}
@@ -48,9 +48,9 @@ namespace Granger.Tests.Conformity
 				input.SelectToken("inner[0].value")
 			};
 
-			var output = _renderer.Render(input, replacements);
+			var output = _renderer.Render(replacements);
 
-			var paths = output["__conformity"]["paths"].ToObject<IEnumerable<string>>();
+			var paths = output["paths"].ToObject<IEnumerable<string>>();
 
 			paths.ShouldBe(new[] { "location", "inner[0].value" });
 		}
@@ -73,8 +73,8 @@ namespace Granger.Tests.Conformity
 				input.SelectToken("inner[0].value")
 			};
 
-			var output = _renderer.Render(input, replacements);
-			var examples = output["__conformity"]["examples"];
+			var output = _renderer.Render(replacements);
+			var examples = output["examples"];
 
 			var option1 = examples.First;
 			var option2 = examples.Last;
