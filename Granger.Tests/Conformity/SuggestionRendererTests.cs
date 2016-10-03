@@ -26,8 +26,10 @@ namespace Granger.Tests.Conformity
 			});
 
 			var output = _renderer.Render(Enumerable.Empty<JToken>().ToList());
+			var dto = output.ToObject<ConformityDto>();
 
-			output.ToString().ShouldBe(input.ToString());
+			dto.Examples.ShouldBeEmpty();
+			dto.Paths.ShouldBeEmpty();
 		}
 
 		[Fact]
@@ -36,7 +38,7 @@ namespace Granger.Tests.Conformity
 			var input = JToken.FromObject(new
 			{
 				location = "http://example.com",
-				inner = new []
+				inner = new[]
 				{
 					new { value = "http://other.example.com" }
 				}

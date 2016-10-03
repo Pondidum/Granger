@@ -52,6 +52,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Conformity\ConformityDto.cs" />
     <Compile Include="Conformity\SuggestionRenderer.cs" />
     <Compile Include="Conformity\UrlFinder.cs" />
     <Compile Include="Decorators\CollectionRangeMiddleware.cs" />

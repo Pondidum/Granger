@@ -31,11 +31,5 @@ namespace Granger.Conformity
 
 			return JToken.FromObject(report, JsonSerializer.Create(JsonSettings));
 		}
-
-		private class ConformityDto
-		{
-			public IEnumerable<string> Paths { get; set; }
-			public IEnumerable<object> Examples { get; set; }
-		}
 	}
 }
