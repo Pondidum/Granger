@@ -1,14 +1,28 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Granger.Conformity;
 using Microsoft.Owin;
+using Newtonsoft.Json.Linq;
 
 namespace Granger.Decorators
 {
 	public class ConformityChecker : OwinMiddleware
 	{
-		public ConformityChecker(OwinMiddleware next) : base(next)
+		private readonly UrlFinder _finder;
+		private readonly SuggestionRenderer _renderer;
+
+		public ConformityChecker(OwinMiddleware next)
+			: this(next, new UrlFinder(), new SuggestionRenderer())
 		{
+		}
+
+		public ConformityChecker(OwinMiddleware next, UrlFinder finder, SuggestionRenderer renderer) : base(next)
+		{
+			_finder = finder;
+			_renderer = renderer;
 		}
 
 		public override async Task Invoke(IOwinContext context)
@@ -22,6 +36,32 @@ namespace Granger.Decorators
 			if (string.Equals(contentType, "application/json") == false)
 				return;
 
+			var content = await context.Response.ReadAsString();
+			var jo = JToken.Parse(content);
+
+			var problems = _finder.Execute(jo).ToList();
+
+			if (problems.Any())
+			{
+				var index = content.LastIndexOf('}');
+
+				var before = content.Substring(0, index);
+				var after = content.Substring(index);
+
+				var output = _renderer.Render(problems).ToString();
+
+				await context.WriteString(string.Concat(
+					before,
+					before.EndsWith(",") ? "" : ",",
+					"\r\n",
+					"__conformity: " + output,
+					after
+				));
+			}
+			else
+			{
+				await context.WriteString(content);
+			}
 		}
 	}
 }

@@ -47,7 +47,7 @@ namespace Granger.Decorators
 				jo = JToken.FromObject(chopped);
 			}
 
-			context.Response.Body = jo.WriteJson();
+			context.WriteJson(jo);
 		}
 
 		private static int GetOrDefault(IOwinRequest request, string key, int defaultValue)

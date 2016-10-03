@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Granger.Conformity;
 using Granger.Decorators;
 using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NSubstitute;
 using Owin;
 using Shouldly;
 using Xunit;
@@ -15,32 +20,50 @@ namespace Granger.Tests.Decorators
 {
 	public class ConformityCheckerTests : IDisposable
 	{
-		private TestServer _server;
-		private IOwinResponse _response;
+		private Action<IOwinResponse> _controllerResponse;
+		private readonly TestServer _server;
+		private  IOwinResponse _response;
+		private readonly UrlFinder _finder;
+		private readonly SuggestionRenderer _renderer;
 
-		private void CreateServer(Action<IOwinResponse> handle)
+		public ConformityCheckerTests()
 		{
+			_finder = Substitute.For<UrlFinder>();
+			_renderer = Substitute.For<SuggestionRenderer>();
+
 			_server = TestServer.Create(app =>
 			{
-				app.Use<ConformityChecker>();
+				app.Use<ConformityChecker>(_finder, _renderer);
 				app.Run(async context =>
 				{
-					handle(context.Response);
+					_controllerResponse(context.Response);
 					_response = context.Response;
 					await Task.Yield();
 				});
 			});
 		}
 
-		private static void Content(IOwinResponse res, string contentType, string content)
+
+		private void JsonResponse(object toSerialize)
 		{
-			res.Headers[HttpResponseHeader.ContentType.ToString()] = contentType;
-			res.Body = new MemoryStream(Encoding.UTF8.GetBytes(content));
+			JsonResponse(JsonConvert.SerializeObject(toSerialize));
 		}
 
-		private void Execute()
+		private void JsonResponse(string json)
 		{
-			_server.CreateRequest("/path").GetAsync().Wait();
+			_controllerResponse = response =>
+			{
+				response.ContentType = "application/json";
+				response.Body = new MemoryStream(Encoding.UTF8.GetBytes(json));
+			};
+		}
+
+		private void Execute(string contentType = "application/json")
+		{
+			_server.CreateRequest("/path")
+				.AddHeader(HttpRequestHeader.ContentType.ToString(), contentType)
+				.GetAsync()
+				.Wait();
 		}
 
 		private static string FromStream(Stream stream)
@@ -54,9 +77,13 @@ namespace Granger.Tests.Decorators
 		{
 			var xml = "<root>http://example.com</root>";
 
-			CreateServer(res => Content(res, "text/xml", xml));
+			_controllerResponse = response =>
+			{
+				response.ContentType = "text/xml";
+				response.Body = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+			};
 
-			Execute();
+			Execute("text/xml");
 
 			FromStream(_response.Body).ShouldBe(xml);
 		}
@@ -64,9 +91,11 @@ namespace Granger.Tests.Decorators
 		[Fact]
 		public void When_the_response_is_json_with_nothing_to_check_for()
 		{
-			var json = JsonConvert.SerializeObject(new { Name = "Andy" });
+			var json = "{ \"name\":\"Andy Dote\" }";
 
-			CreateServer(res => Content(res, "application/json", json));
+			_finder.Execute(Arg.Any<JToken>()).Returns(Enumerable.Empty<JToken>());
+
+			JsonResponse(json);
 
 			Execute();
 
@@ -76,9 +105,10 @@ namespace Granger.Tests.Decorators
 		[Fact]
 		public void When_the_response_has_a_conforming_href()
 		{
-			var json = JsonConvert.SerializeObject(new { href= "http://example.com" });
+			_finder.Execute(Arg.Any<JToken>()).Returns(Enumerable.Empty<JToken>());
+			var json = JsonConvert.SerializeObject(new { href = "http://test.com" });
 
-			CreateServer(res => Content(res, "application/json", json));
+			JsonResponse(json);
 
 			Execute();
 
@@ -86,25 +116,23 @@ namespace Granger.Tests.Decorators
 		}
 
 		[Fact]
-		public void When_the_response_has_a_non_conforming_href()
+		public void When_the_response_has_non_conforming_properties()
 		{
-			var dto = new { location = "http://example.com" };
+			var problems = new[]
+			{
+				JToken.FromObject(new { })
+			};
 
-			CreateServer(res => Content(res, "application/json", JsonConvert.SerializeObject(dto)));
+			_finder.Execute(Arg.Any<JToken>()).Returns(problems);
+			_renderer.Render(Arg.Any<ICollection<JToken>>()).Returns(JToken.Parse("{}"));
+
+			var json = JsonConvert.SerializeObject(new { href = "http://test.com" });
+
+			JsonResponse(json);
 
 			Execute();
 
-			var expectedResponse = new
-			{
-				Original = dto,
-				Options = new object[]
-				{
-					new { href = "http://example.com" },
-					new { location = new { href = "http://example.com" } }
-				}
-			};
-
-			FromStream(_response.Body).ShouldBe(Json(expectedResponse));
+			_renderer.Received().Render(Arg.Any<ICollection<JToken>>());
 		}
 
 		private static string Json(object obj) => JsonConvert.SerializeObject(obj);
