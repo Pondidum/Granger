@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -43,18 +42,20 @@ namespace Granger.Decorators
 
 			if (problems.Any())
 			{
-				var index = content.LastIndexOf('}');
+				var index = Math.Max(content.LastIndexOf('}'), content.LastIndexOf(']'));
 
 				var before = content.Substring(0, index);
 				var after = content.Substring(index);
 
-				var output = _renderer.Render(problems).ToString();
+				var output = "\"__conformity\":" + _renderer.Render(problems);
+
+				if (jo.Type == JTokenType.Array)
+					output = "{" + output + "}";
 
 				await context.WriteString(string.Concat(
 					before,
 					before.EndsWith(",") ? "" : ",",
-					"\r\n",
-					"__conformity: " + output,
+					output,
 					after
 				));
 			}

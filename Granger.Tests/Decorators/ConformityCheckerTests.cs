@@ -135,6 +135,38 @@ namespace Granger.Tests.Decorators
 			_renderer.Received().Render(Arg.Any<ICollection<JToken>>());
 		}
 
+		[Fact]
+		public async Task When_the_response_is_an_array()
+		{
+			var problems = new[]
+			{
+				JToken.FromObject(new { })
+			};
+
+			_finder.Execute(Arg.Any<JToken>()).Returns(problems);
+			_renderer.Render(Arg.Any<ICollection<JToken>>()).Returns(JToken.Parse("{}"));
+
+			var json = JsonConvert.SerializeObject(new object[]
+			{
+				new { name = "andy" },
+				new { name = "dave" }
+			});
+
+			JsonResponse(json);
+
+			Execute();
+
+			var expected = JsonConvert.SerializeObject(new object[]
+			{
+				new { name = "andy" },
+				new { name = "dave" },
+				new { __conformity = new {} }
+			});
+
+			var response = await _response.ReadAsString();
+			response.ShouldBe(expected);
+		}
+
 		private static string Json(object obj) => JsonConvert.SerializeObject(obj);
 
 		public void Dispose()
