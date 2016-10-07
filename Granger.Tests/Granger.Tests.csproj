@@ -89,6 +89,7 @@
     <Compile Include="Decorators\CollectionRangeMiddlewareTests.cs" />
     <Compile Include="Decorators\ConformityCheckerTests.cs" />
     <Compile Include="Decorators\HttpMethodOverrideTests.cs" />
+    <Compile Include="Decorators\RequestHeaderValidatorTests.cs" />
     <Compile Include="Decorators\ResponseHeaderValidatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scratchpad.cs" />
