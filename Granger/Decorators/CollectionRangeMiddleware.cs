@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Newtonsoft.Json;
@@ -28,14 +29,24 @@ namespace Granger.Decorators
 
 		public override async Task Invoke(IOwinContext context)
 		{
+			var stream = context.Response.Body;
+			var buffer = new MemoryStream();
+
+			context.Response.Body = buffer;
+
 			await Next.Invoke(context);
 
 			var contentType = context.Response.Headers.GetValues(HttpResponseHeader.ContentType.ToString());
 
 			if (contentType != null && contentType.All(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase) == false))
+			{
+				buffer.Position = 0;
+				await buffer.CopyToAsync(stream);
 				return;
+			}
 
-			var jo = context.Response.ReadJson();
+			var json = Encoding.UTF8.GetString(buffer.ToArray());
+			var jo = JToken.Parse(json);
 
 			if (jo.Type == JTokenType.Array)
 			{
@@ -47,7 +58,9 @@ namespace Granger.Decorators
 				jo = JToken.FromObject(chopped);
 			}
 
-			context.WriteJson(jo);
+			var bytes = Encoding.UTF8.GetBytes(jo.ToString(Formatting.None));
+
+			await stream.WriteAsync(bytes, 0, bytes.Count());
 		}
 
 		private static int GetOrDefault(IOwinRequest request, string key, int defaultValue)

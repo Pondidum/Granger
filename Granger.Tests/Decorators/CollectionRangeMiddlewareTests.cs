@@ -17,7 +17,7 @@ namespace Granger.Tests.Decorators
 	public class CollectionRangeMiddlewareTests : IDisposable
 	{
 		private TestServer _server;
-		private IOwinResponse _response;
+		//private IOwinResponse _response;
 
 		private void CreateServer(Action<IOwinResponse> handle)
 		{
@@ -27,7 +27,7 @@ namespace Granger.Tests.Decorators
 				app.Run(async context =>
 				{
 					handle(context.Response);
-					_response = context.Response;
+					//_response = context.Response;
 					await Task.Yield();
 				});
 			});
@@ -41,7 +41,7 @@ namespace Granger.Tests.Decorators
 				app.Run(async context =>
 				{
 					handle(context.Response);
-					_response = context.Response;
+					//_response = context.Response;
 					await Task.Yield();
 				});
 			});
@@ -56,12 +56,12 @@ namespace Granger.Tests.Decorators
 			CreateServer(res =>
 			{
 				res.Headers[HttpResponseHeader.ContentType.ToString()]= "text/xml";
-				res.Body = StreamFromString(xml);
+				res.Write(xml);
 			});
 
-			await _server.CreateRequest("resource?start=0&limit=10").GetAsync();
+			var response = await _server.CreateRequest("resource?start=0&limit=10").GetAsync();
 
-			StringFromStream(_response.Body)
+			StringFromStream(await response.Content.ReadAsStreamAsync())
 				.ShouldBe(xml);
 		}
 
@@ -72,9 +72,9 @@ namespace Granger.Tests.Decorators
 
 			CreateServer(res => ReturnJson(res, json));
 
-			await _server.CreateRequest("resource?start=0&limit=10").GetAsync();
+			var response = await _server.CreateRequest("resource?start=0&limit=10").GetAsync();
 
-			StringFromStream(_response.Body)
+			StringFromStream(await response.Content.ReadAsStreamAsync())
 				.ShouldBe(json);
 		}
 
@@ -85,9 +85,9 @@ namespace Granger.Tests.Decorators
 
 			CreateServer(res => ReturnJson(res, json));
 
-			await _server.CreateRequest("resource?start=0&limit=10").GetAsync();
+			var response = await _server.CreateRequest("resource?start=0&limit=10").GetAsync();
 
-			StringFromStream(_response.Body)
+			StringFromStream(await response.Content.ReadAsStreamAsync())
 				.ShouldBe(json);
 		}
 
@@ -98,9 +98,9 @@ namespace Granger.Tests.Decorators
 
 			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
-			await _server.CreateRequest("resource").GetAsync();
+			var response = await _server.CreateRequest("resource").GetAsync();
 
-			StringFromStream(_response.Body)
+			StringFromStream(await response.Content.ReadAsStreamAsync())
 				.ShouldBe(JsonConvert.SerializeObject(collection.Take(10)));
 		}
 
@@ -111,9 +111,9 @@ namespace Granger.Tests.Decorators
 
 			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
-			await _server.CreateRequest("resource?start=-40&limit=10").GetAsync();
+			var response = await _server.CreateRequest("resource?start=-40&limit=10").GetAsync();
 
-			StringFromStream(_response.Body)
+			StringFromStream(await response.Content.ReadAsStreamAsync())
 				.ShouldBe(JsonConvert.SerializeObject(collection.Take(10)));
 		}
 
@@ -124,9 +124,9 @@ namespace Granger.Tests.Decorators
 
 			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
-			await _server.CreateRequest("resource?start=0&limit=-5").GetAsync();
+			var response = await _server.CreateRequest("resource?start=0&limit=-5").GetAsync();
 
-			StringFromStream(_response.Body)
+			StringFromStream(await response.Content.ReadAsStreamAsync())
 				.ShouldBe(JsonConvert.SerializeObject(Enumerable.Empty<int>()));
 		}
 
@@ -137,9 +137,9 @@ namespace Granger.Tests.Decorators
 
 			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
-			await _server.CreateRequest("resource?start=5&limit=10").GetAsync();
+			var response = await _server.CreateRequest("resource?start=5&limit=10").GetAsync();
 
-			StringFromStream(_response.Body)
+			StringFromStream(await response.Content.ReadAsStreamAsync())
 				.ShouldBe(JsonConvert.SerializeObject(collection.Skip(5).Take(10)));
 		}
 
@@ -150,9 +150,9 @@ namespace Granger.Tests.Decorators
 
 			CreateServer(res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
-			await _server.CreateRequest("resource?start=50&limit=10").GetAsync();
+			var response = await _server.CreateRequest("resource?start=50&limit=10").GetAsync();
 
-			StringFromStream(_response.Body)
+			StringFromStream(await response.Content.ReadAsStreamAsync())
 				.ShouldBe(JsonConvert.SerializeObject(Enumerable.Empty<int>()));
 		}
 
@@ -163,21 +163,16 @@ namespace Granger.Tests.Decorators
 
 			CreateServerWithPageSize(7, res => ReturnJson(res, JsonConvert.SerializeObject(collection)));
 
-			await _server.CreateRequest("resource?start=5").GetAsync();
+			var response = await _server.CreateRequest("resource?start=5").GetAsync();
 
-			StringFromStream(_response.Body)
+			StringFromStream(await response.Content.ReadAsStreamAsync())
 				.ShouldBe(JsonConvert.SerializeObject(collection.Skip(5).Take(7)));
 		}
 
 		private static void ReturnJson(IOwinResponse res, string json)
 		{
 			res.Headers[HttpResponseHeader.ContentType.ToString()] = "application/json";
-			res.Body = StreamFromString(json);
-		}
-
-		private static  MemoryStream StreamFromString(string value)
-		{
-			return new MemoryStream(Encoding.UTF8.GetBytes(value ?? ""));
+			res.Write(json);
 		}
 
 		private static string StringFromStream(Stream stream)
