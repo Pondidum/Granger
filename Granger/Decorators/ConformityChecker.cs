@@ -32,7 +32,7 @@ namespace Granger.Decorators
 			var headers = request.Headers.GetValues(HttpRequestHeader.ContentType.ToString());
 			var contentType = headers?.FirstOrDefault(value => string.IsNullOrWhiteSpace(value) == false);
 
-			if (string.Equals(contentType, "application/json") == false)
+			if (string.Equals(contentType, "application/json", StringComparison.OrdinalIgnoreCase) == false)
 				return;
 
 			var content = await context.Response.ReadAsString();
