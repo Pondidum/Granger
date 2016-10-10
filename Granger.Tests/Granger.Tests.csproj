@@ -90,6 +90,7 @@
     <Compile Include="Decorators\ConformityCheckerTests.cs" />
     <Compile Include="Decorators\ContractionMiddlewareTests.cs" />
     <Compile Include="Decorators\HttpMethodOverrideTests.cs" />
+    <Compile Include="Decorators\InterceptingMiddlewareTests.cs" />
     <Compile Include="Decorators\RequestHeaderValidatorTests.cs" />
     <Compile Include="Decorators\ResponseHeaderValidatorTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
