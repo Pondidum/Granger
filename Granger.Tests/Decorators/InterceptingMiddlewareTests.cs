@@ -22,7 +22,7 @@ namespace Granger.Tests.Decorators
 		{
 			_server = TestServer.Create(app =>
 			{
-				app.Use<TestInterceptMiddleware>(_postHandle);
+				app.Use<TestPostInterceptMiddleware>(_postHandle);
 				app.Run(async context =>
 				{
 					_innerHandle(context.Request, context.Response);
@@ -104,11 +104,11 @@ namespace Granger.Tests.Decorators
 			_server.Dispose();
 		}
 
-		private class TestInterceptMiddleware : InterceptingMiddleware
+		private class TestPostInterceptMiddleware : InterceptingMiddleware
 		{
 			private readonly Func<IOwinContext, MemoryStream, Task<MemoryStream>> _handle;
 
-			public TestInterceptMiddleware(OwinMiddleware next, Func<IOwinContext, MemoryStream, Task<MemoryStream>> handle) : base(next)
+			public TestPostInterceptMiddleware(OwinMiddleware next, Func<IOwinContext, MemoryStream, Task<MemoryStream>> handle) : base(next)
 			{
 				_handle = handle;
 			}

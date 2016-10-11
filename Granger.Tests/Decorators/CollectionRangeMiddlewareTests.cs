@@ -17,7 +17,6 @@ namespace Granger.Tests.Decorators
 	public class CollectionRangeMiddlewareTests : IDisposable
 	{
 		private TestServer _server;
-		//private IOwinResponse _response;
 
 		private void CreateServer(Action<IOwinResponse> handle)
 		{
@@ -27,7 +26,6 @@ namespace Granger.Tests.Decorators
 				app.Run(async context =>
 				{
 					handle(context.Response);
-					//_response = context.Response;
 					await Task.Yield();
 				});
 			});
@@ -41,7 +39,6 @@ namespace Granger.Tests.Decorators
 				app.Run(async context =>
 				{
 					handle(context.Response);
-					//_response = context.Response;
 					await Task.Yield();
 				});
 			});
