@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Granger.Conformity;
@@ -22,7 +23,6 @@ namespace Granger.Tests.Decorators
 	{
 		private Action<IOwinResponse> _controllerResponse;
 		private readonly TestServer _server;
-		private  IOwinResponse _response;
 		private readonly UrlFinder _finder;
 		private readonly SuggestionRenderer _renderer;
 
@@ -37,7 +37,6 @@ namespace Granger.Tests.Decorators
 				app.Run(async context =>
 				{
 					_controllerResponse(context.Response);
-					_response = context.Response;
 					await Task.Yield();
 				});
 			});
@@ -54,16 +53,16 @@ namespace Granger.Tests.Decorators
 			_controllerResponse = response =>
 			{
 				response.ContentType = "application/json";
-				response.Body = new MemoryStream(Encoding.UTF8.GetBytes(json));
+				response.Write(json);
 			};
 		}
 
-		private void Execute(string contentType = "application/json")
+		private async Task<HttpResponseMessage> Execute(string contentType = "application/json")
 		{
-			_server.CreateRequest("/path")
+			return await _server
+				.CreateRequest("/path")
 				.AddHeader(HttpRequestHeader.ContentType.ToString(), contentType)
-				.GetAsync()
-				.Wait();
+				.GetAsync();
 		}
 
 		private static string FromStream(Stream stream)
@@ -73,23 +72,24 @@ namespace Granger.Tests.Decorators
 		}
 
 		[Fact]
-		public void When_the_response_is_not_json()
+		public async Task When_the_response_is_not_json()
 		{
 			var xml = "<root>http://example.com</root>";
 
-			_controllerResponse = response =>
+			_controllerResponse = res =>
 			{
-				response.ContentType = "text/xml";
-				response.Body = new MemoryStream(Encoding.UTF8.GetBytes(xml));
+				res.ContentType = "text/xml";
+				res.Write(xml);
 			};
 
-			Execute("text/xml");
+			var response = await Execute("text/xml");
 
-			FromStream(_response.Body).ShouldBe(xml);
+			var content = await response.Content.ReadAsStringAsync();
+			content.ShouldBe(xml);
 		}
 
 		[Fact]
-		public void When_the_response_is_json_with_nothing_to_check_for()
+		public async Task When_the_response_is_json_with_nothing_to_check_for()
 		{
 			var json = "{ \"name\":\"Andy Dote\" }";
 
@@ -97,26 +97,28 @@ namespace Granger.Tests.Decorators
 
 			JsonResponse(json);
 
-			Execute();
+			var response = await Execute();
 
-			FromStream(_response.Body).ShouldBe(json);
+			var content = await response.Content.ReadAsStringAsync();
+			content.ShouldBe(json);
 		}
 
 		[Fact]
-		public void When_the_response_has_a_conforming_href()
+		public async Task When_the_response_has_a_conforming_href()
 		{
 			_finder.Execute(Arg.Any<JToken>()).Returns(Enumerable.Empty<JToken>());
 			var json = JsonConvert.SerializeObject(new { href = "http://test.com" });
 
 			JsonResponse(json);
 
-			Execute();
+			var response = await Execute();
 
-			FromStream(_response.Body).ShouldBe(json);
+			var content = await response.Content.ReadAsStringAsync();
+			content.ShouldBe(json);
 		}
 
 		[Fact]
-		public void When_the_response_has_non_conforming_properties()
+		public async Task When_the_response_has_non_conforming_properties()
 		{
 			var problems = new[]
 			{
@@ -130,7 +132,7 @@ namespace Granger.Tests.Decorators
 
 			JsonResponse(json);
 
-			Execute();
+			var response = await Execute();
 
 			_renderer.Received().Render(Arg.Any<ICollection<JToken>>());
 		}
@@ -154,7 +156,7 @@ namespace Granger.Tests.Decorators
 
 			JsonResponse(json);
 
-			Execute();
+			var response = await Execute();
 
 			var expected = JsonConvert.SerializeObject(new object[]
 			{
@@ -163,8 +165,8 @@ namespace Granger.Tests.Decorators
 				new { __conformity = new {} }
 			});
 
-			var response = await _response.ReadAsString();
-			response.ShouldBe(expected);
+			var content = await response.Content.ReadAsStringAsync();
+			content.ShouldBe(expected);
 		}
 
 		private static string Json(object obj) => JsonConvert.SerializeObject(obj);

@@ -1,6 +1,8 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Granger.Conformity;
 using Microsoft.Owin;
@@ -8,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Granger.Decorators
 {
-	public class ConformityChecker : OwinMiddleware
+	public class ConformityChecker : InterceptingMiddleware
 	{
 		private readonly UrlFinder _finder;
 		private readonly SuggestionRenderer _renderer;
@@ -24,45 +26,39 @@ namespace Granger.Decorators
 			_renderer = renderer;
 		}
 
-		public override async Task Invoke(IOwinContext context)
+		protected override async Task<MemoryStream> AfterNext(IOwinContext context, MemoryStream internalMiddleware)
 		{
-			await Next.Invoke(context);
-
 			var request = context.Request;
 			var headers = request.Headers.GetValues(HttpRequestHeader.ContentType.ToString());
 			var contentType = headers?.FirstOrDefault(value => string.IsNullOrWhiteSpace(value) == false);
 
 			if (string.Equals(contentType, "application/json", StringComparison.OrdinalIgnoreCase) == false)
-				return;
+				return await base.AfterNext(context, internalMiddleware);
 
-			var content = await context.Response.ReadAsString();
+			var content = Encoding.UTF8.GetString(internalMiddleware.ToArray());
 			var jo = JToken.Parse(content);
 
 			var problems = _finder.Execute(jo).ToList();
 
-			if (problems.Any())
-			{
-				var index = Math.Max(content.LastIndexOf('}'), content.LastIndexOf(']'));
+			if (problems.Any() == false)
+				return await base.AfterNext(context, internalMiddleware);
 
-				var before = content.Substring(0, index);
-				var after = content.Substring(index);
+			var index = Math.Max(content.LastIndexOf('}'), content.LastIndexOf(']'));
 
-				var output = "\"__conformity\":" + _renderer.Render(problems);
+			var before = content.Substring(0, index);
+			var after = content.Substring(index);
 
-				if (jo.Type == JTokenType.Array)
-					output = "{" + output + "}";
+			var output = "\"__conformity\":" + _renderer.Render(problems);
 
-				await context.WriteString(string.Concat(
-					before,
-					before.EndsWith(",") ? "" : ",",
-					output,
-					after
-				));
-			}
-			else
-			{
-				await context.WriteString(content);
-			}
+			if (jo.Type == JTokenType.Array)
+				output = "{" + output + "}";
+
+			return new MemoryStream(Encoding.UTF8.GetBytes(string.Concat(
+				before,
+				before.EndsWith(",") ? "" : ",",
+				output,
+				after
+			)));
 		}
 	}
 }
