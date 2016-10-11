@@ -10,7 +10,7 @@ using Newtonsoft.Json.Linq;
 
 namespace Granger.Decorators
 {
-	public class CollectionRangeMiddleware : OwinMiddleware
+	public class CollectionRangeMiddleware : InterceptingMiddleware
 	{
 		public const int DefaultPageSize = 10;
 
@@ -27,25 +27,15 @@ namespace Granger.Decorators
 			_pageSize = pageSize;
 		}
 
-		public override async Task Invoke(IOwinContext context)
+		protected override async Task<MemoryStream> AfterNext(IOwinContext context, MemoryStream internalMiddleware)
 		{
-			var stream = context.Response.Body;
-			var buffer = new MemoryStream();
-
-			context.Response.Body = buffer;
-
-			await Next.Invoke(context);
 
 			var contentType = context.Response.Headers.GetValues(HttpResponseHeader.ContentType.ToString());
 
 			if (contentType != null && contentType.All(c => c.Equals("application/json", StringComparison.OrdinalIgnoreCase) == false))
-			{
-				buffer.Position = 0;
-				await buffer.CopyToAsync(stream);
-				return;
-			}
+				return await base.AfterNext(context, internalMiddleware);
 
-			var json = Encoding.UTF8.GetString(buffer.ToArray());
+			var json = Encoding.UTF8.GetString(internalMiddleware.ToArray());
 			var jo = JToken.Parse(json);
 
 			if (jo.Type == JTokenType.Array)
@@ -60,7 +50,7 @@ namespace Granger.Decorators
 
 			var bytes = Encoding.UTF8.GetBytes(jo.ToString(Formatting.None));
 
-			await stream.WriteAsync(bytes, 0, bytes.Count());
+			return new MemoryStream(bytes);
 		}
 
 		private static int GetOrDefault(IOwinRequest request, string key, int defaultValue)
@@ -73,7 +63,5 @@ namespace Granger.Decorators
 				? result
 				: defaultValue;
 		}
-
-
 	}
 }
