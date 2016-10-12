@@ -108,6 +108,11 @@ namespace Granger.Tests.Decorators
 					town = "Some Town",
 					county = "Some County",
 					country = "Some Country",
+				},
+				email = new
+				{
+					value = "test@home.com",
+					type = "home"
 				}
 			}));
 
@@ -122,6 +127,11 @@ namespace Granger.Tests.Decorators
 				address = new
 				{
 					href = "http://example/1/address"
+				},
+				email = new
+				{
+					value = "test@home.com",
+					type = "home"
 				}
 			}));
 		}
