@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Granger.Decorators;
-using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Newtonsoft.Json;
 using Owin;
@@ -10,33 +10,28 @@ using Xunit;
 
 namespace Granger.Tests.Decorators
 {
-	public class ContractionMiddlewareTests : IDisposable
+	public class ContractionMiddlewareTests
 	{
-		private Action<IOwinResponse> _respondWith;
-		private readonly TestServer _server;
-
-		public ContractionMiddlewareTests()
+		private async Task<string> JsonResponse(string json)
 		{
-			_server = TestServer.Create(app =>
+			Action<IAppBuilder> host = app =>
 			{
 				app.Use<ContractionMiddleware>();
 
 				app.Run(async context =>
 				{
-					_respondWith(context.Response);
+					context.Response.ContentType = "application/json";
+					context.Response.Write(json);
 
 					await Task.Yield();
 				});
-			});
-		}
-
-		private void JsonResponse(string json)
-		{
-			_respondWith = res =>
-			{
-				res.ContentType = "application/json";
-				res.Write(json);
 			};
+
+			using (var server = TestServer.Create(host))
+			{
+				var response = await server.CreateRequest("/resource").GetAsync();
+				return await response.Content.ReadAsStringAsync();
+			}
 		}
 
 		[Fact]
@@ -49,19 +44,15 @@ namespace Granger.Tests.Decorators
 				age = 30
 			});
 
-			JsonResponse(json);
+			var response = await JsonResponse(json);
 
-			var response = await _server.CreateRequest("/resource").GetAsync();
-			var responseContent = await response.Content.ReadAsStringAsync();
-
-			responseContent.ShouldBe(json);
+			response.ShouldBe(json);
 		}
-
 
 		[Fact]
 		public async Task When_an_object_has_a_child_object_without_an_href()
 		{
-			JsonResponse(JsonConvert.SerializeObject(new
+			var response = await JsonResponse(JsonConvert.SerializeObject(new
 			{
 				href = "http://example/1",
 				name = "andy dote",
@@ -75,10 +66,7 @@ namespace Granger.Tests.Decorators
 				}
 			}));
 
-			var response = await _server.CreateRequest("/resource").GetAsync();
-			var responseContent = await response.Content.ReadAsStringAsync();
-
-			responseContent.ShouldBe(JsonConvert.SerializeObject(new
+			response.ShouldBe(JsonConvert.SerializeObject(new
 			{
 				href = "http://example/1",
 				name = "andy dote",
@@ -96,7 +84,7 @@ namespace Granger.Tests.Decorators
 		[Fact]
 		public async Task When_an_object_has_a_child_object_with_an_href()
 		{
-			JsonResponse(JsonConvert.SerializeObject(new
+			var response = await JsonResponse(JsonConvert.SerializeObject(new
 			{
 				href = "http://example/1",
 				name = "andy dote",
@@ -116,10 +104,7 @@ namespace Granger.Tests.Decorators
 				}
 			}));
 
-			var response = await _server.CreateRequest("/resource").GetAsync();
-			var responseContent = await response.Content.ReadAsStringAsync();
-
-			responseContent.ShouldBe(JsonConvert.SerializeObject(new
+			response.ShouldBe(JsonConvert.SerializeObject(new
 			{
 				href = "http://example/1",
 				name = "andy dote",
@@ -139,7 +124,7 @@ namespace Granger.Tests.Decorators
 		[Fact]
 		public async Task When_an_object_has_a_grand_child_object_with_an_href()
 		{
-			JsonResponse(JsonConvert.SerializeObject(new
+			var response = await JsonResponse(JsonConvert.SerializeObject(new
 			{
 				href = "http://example/1",
 				name = "andy dote",
@@ -159,10 +144,7 @@ namespace Granger.Tests.Decorators
 				}
 			}));
 
-			var response = await _server.CreateRequest("/resource").GetAsync();
-			var responseContent = await response.Content.ReadAsStringAsync();
-
-			responseContent.ShouldBe(JsonConvert.SerializeObject(new
+			response.ShouldBe(JsonConvert.SerializeObject(new
 			{
 				href = "http://example/1",
 				name = "andy dote",
@@ -184,7 +166,7 @@ namespace Granger.Tests.Decorators
 		[Fact]
 		public async Task When_an_object_has_a_child_and_grand_child_object_with_an_href()
 		{
-			JsonResponse(JsonConvert.SerializeObject(new
+			var response = await JsonResponse(JsonConvert.SerializeObject(new
 			{
 				href = "http://example/1",
 				name = "andy dote",
@@ -205,10 +187,7 @@ namespace Granger.Tests.Decorators
 				}
 			}));
 
-			var response = await _server.CreateRequest("/resource").GetAsync();
-			var responseContent = await response.Content.ReadAsStringAsync();
-
-			responseContent.ShouldBe(JsonConvert.SerializeObject(new
+			response.ShouldBe(JsonConvert.SerializeObject(new
 			{
 				href = "http://example/1",
 				name = "andy dote",
@@ -218,11 +197,6 @@ namespace Granger.Tests.Decorators
 					href = "http://example/1/address"
 				}
 			}));
-		}
-
-		public void Dispose()
-		{
-			_server.Dispose();
 		}
 	}
 }
