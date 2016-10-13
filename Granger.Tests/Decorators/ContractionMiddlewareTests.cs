@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Granger.Decorators;
 using Microsoft.Owin.Testing;
@@ -12,11 +11,16 @@ namespace Granger.Tests.Decorators
 {
 	public class ContractionMiddlewareTests
 	{
-		private async Task<string> JsonResponse(string json)
+		private async Task<string> JsonResponseWithId(string key, string json)
+		{
+			return await JsonResponse(json, key);
+		}
+
+		private async Task<string> JsonResponse(string json, string key = "href")
 		{
 			Action<IAppBuilder> host = app =>
 			{
-				app.Use<ContractionMiddleware>();
+				app.Use<ContractionMiddleware>(key);
 
 				app.Run(async context =>
 				{
@@ -195,6 +199,46 @@ namespace Granger.Tests.Decorators
 				address = new
 				{
 					href = "http://example/1/address"
+				}
+			}));
+		}
+
+		[Fact]
+		public async Task When_an_object_has_a_child_object_with_a_custom_id()
+		{
+			var response = await JsonResponseWithId("id", JsonConvert.SerializeObject(new
+			{
+				id = "http://example/1",
+				name = "andy dote",
+				age = 30,
+				address = new
+				{
+					id = "http://example/1/address",
+					line1 = "First",
+					town = "Some Town",
+					county = "Some County",
+					country = "Some Country",
+				},
+				email = new
+				{
+					value = "test@home.com",
+					type = "home"
+				}
+			}));
+
+			response.ShouldBe(JsonConvert.SerializeObject(new
+			{
+				id = "http://example/1",
+				name = "andy dote",
+				age = 30,
+				address = new
+				{
+					id = "http://example/1/address"
+				},
+				email = new
+				{
+					value = "test@home.com",
+					type = "home"
 				}
 			}));
 		}

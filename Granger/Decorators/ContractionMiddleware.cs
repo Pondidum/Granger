@@ -12,8 +12,15 @@ namespace Granger.Decorators
 {
 	public class ContractionMiddleware : InterceptingMiddleware
 	{
-		public ContractionMiddleware(OwinMiddleware next) : base(next)
+		private readonly string _keyField;
+
+		public ContractionMiddleware(OwinMiddleware next) : this(next, "href")
 		{
+		}
+
+		public ContractionMiddleware(OwinMiddleware next, string keyField) : base(next)
+		{
+			_keyField = keyField;
 		}
 
 		protected override async Task<MemoryStream> AfterNext(IOwinContext context, MemoryStream internalMiddleware)
@@ -28,14 +35,14 @@ namespace Granger.Decorators
 
 			var toReplace = Find(jo)
 				.Where(token => token.Value.Type == JTokenType.Object)
-				.Where(token => token.Value.Value<string>("href") != null)
+				.Where(token => token.Value.Value<string>(_keyField) != null)
 				.ToList();
 
 			foreach (var token in toReplace)
 			{
-				token.Parent[token.Name] = JObject.FromObject(new
+				token.Parent[token.Name] = JObject.FromObject(new Dictionary<string, string>
 				{
-					href = token.Value.Value<string>("href")
+					{ _keyField, token.Value.Value<string>(_keyField) }
 				});
 			}
 
