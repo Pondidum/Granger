@@ -136,6 +136,90 @@ namespace Granger.Tests.Decorators
 			}));
 		}
 
+		[Fact]
+		public async Task When_an_object_has_a_grand_child_object_with_an_href()
+		{
+			JsonResponse(JsonConvert.SerializeObject(new
+			{
+				href = "http://example/1",
+				name = "andy dote",
+				age = 30,
+				address = new
+				{
+					line1 = "First",
+					town = "Some Town",
+					county = "Some County",
+					country = "Some Country",
+					postcode = new
+					{
+						href = "http://example/1/address/postcode",
+						code = "testing",
+						value = 123
+					}
+				}
+			}));
+
+			var response = await _server.CreateRequest("/resource").GetAsync();
+			var responseContent = await response.Content.ReadAsStringAsync();
+
+			responseContent.ShouldBe(JsonConvert.SerializeObject(new
+			{
+				href = "http://example/1",
+				name = "andy dote",
+				age = 30,
+				address = new
+				{
+					line1 = "First",
+					town = "Some Town",
+					county = "Some County",
+					country = "Some Country",
+					postcode = new
+					{
+						href = "http://example/1/address/postcode"
+					}
+				}
+			}));
+		}
+
+		[Fact]
+		public async Task When_an_object_has_a_child_and_grand_child_object_with_an_href()
+		{
+			JsonResponse(JsonConvert.SerializeObject(new
+			{
+				href = "http://example/1",
+				name = "andy dote",
+				age = 30,
+				address = new
+				{
+					href = "http://example/1/address",
+					line1 = "First",
+					town = "Some Town",
+					county = "Some County",
+					country = "Some Country",
+					postcode = new
+					{
+						href = "http://example/1/address/postcode",
+						code = "testing",
+						value = 123
+					}
+				}
+			}));
+
+			var response = await _server.CreateRequest("/resource").GetAsync();
+			var responseContent = await response.Content.ReadAsStringAsync();
+
+			responseContent.ShouldBe(JsonConvert.SerializeObject(new
+			{
+				href = "http://example/1",
+				name = "andy dote",
+				age = 30,
+				address = new
+				{
+					href = "http://example/1/address"
+				}
+			}));
+		}
+
 		public void Dispose()
 		{
 			_server.Dispose();

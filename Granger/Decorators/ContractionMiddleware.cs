@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -25,21 +26,35 @@ namespace Granger.Decorators
 			var content = Encoding.UTF8.GetString(internalMiddleware.ToArray());
 			var jo = JObject.Parse(content);
 
-			var toReplace = jo
-				.Properties()
+			var toReplace = Find(jo)
 				.Where(token => token.Value.Type == JTokenType.Object)
 				.Where(token => token.Value.Value<string>("href") != null)
 				.ToList();
 
 			foreach (var token in toReplace)
 			{
-				jo[token.Name] = JObject.FromObject(new
+				token.Parent[token.Name] = JObject.FromObject(new
 				{
 					href = token.Value.Value<string>("href")
 				});
 			}
 
 			return new MemoryStream(Encoding.UTF8.GetBytes(jo.ToString(Formatting.None)));
+		}
+
+
+		private IEnumerable<JProperty> Find(JObject token)
+		{
+			foreach (var child in token.Properties())
+			{
+				yield return child;
+
+				if (child.Value.Type != JTokenType.Object)
+					continue;
+
+				foreach (var inner in Find((JObject)child.Value))
+					yield return inner;
+			}
 		}
 	}
 }
