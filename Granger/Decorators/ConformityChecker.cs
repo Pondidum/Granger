@@ -29,10 +29,8 @@ namespace Granger.Decorators
 		protected override async Task<MemoryStream> AfterNext(IOwinContext context, MemoryStream internalMiddleware)
 		{
 			var request = context.Request;
-			var headers = request.Headers.GetValues(HttpRequestHeader.ContentType.ToString());
-			var contentType = headers?.FirstOrDefault(value => string.IsNullOrWhiteSpace(value) == false);
 
-			if (string.Equals(contentType, "application/json", StringComparison.OrdinalIgnoreCase) == false)
+			if (string.Equals(request.ContentType, "application/json", StringComparison.OrdinalIgnoreCase) == false)
 				return await base.AfterNext(context, internalMiddleware);
 
 			var content = Encoding.UTF8.GetString(internalMiddleware.ToArray());
