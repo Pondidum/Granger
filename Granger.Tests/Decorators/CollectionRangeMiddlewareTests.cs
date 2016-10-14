@@ -52,7 +52,7 @@ namespace Granger.Tests.Decorators
 
 			CreateServer(res =>
 			{
-				res.Headers[HttpResponseHeader.ContentType.ToString()]= "text/xml";
+				res.ContentType = "text/xml";
 				res.Write(xml);
 			});
 
@@ -168,7 +168,7 @@ namespace Granger.Tests.Decorators
 
 		private static void ReturnJson(IOwinResponse res, string json)
 		{
-			res.Headers[HttpResponseHeader.ContentType.ToString()] = "application/json";
+			res.ContentType = "application/json";
 			res.Write(json);
 		}
 
