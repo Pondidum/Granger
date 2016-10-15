@@ -1,18 +1,24 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Newtonsoft.Json;
+using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
 namespace Granger.Decorators
 {
-	public class RequestHeaderValidator : OwinMiddleware
+	public class RequestHeaderValidator
 	{
-		public RequestHeaderValidator(OwinMiddleware next) : base(next)
+		private readonly AppFunc _next;
+
+		public RequestHeaderValidator(AppFunc next)
 		{
+			_next = next;
 		}
 
-		public override async Task Invoke(IOwinContext context)
+		public async Task Invoke(IDictionary<string, object> environment)
 		{
+			var context = new OwinContext(environment);
 			var request = context.Request;
 
 			if (string.IsNullOrWhiteSpace(request.Accept))
@@ -30,7 +36,7 @@ namespace Granger.Decorators
 				return;
 			}
 
-			await Next.Invoke(context);
+			await _next.Invoke(environment);
 		}
 	}
 }
