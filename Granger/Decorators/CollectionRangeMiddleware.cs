@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Owin;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
 namespace Granger.Decorators
 {
@@ -18,11 +19,11 @@ namespace Granger.Decorators
 
 		// ReSharper disable once IntroduceOptionalParameters.Global
 		// As this is an owin middleware, you cannot use optional paramters for the ctor
-		public CollectionRangeMiddleware(OwinMiddleware next) : this(next, DefaultPageSize)
+		public CollectionRangeMiddleware(AppFunc next) : this(next, DefaultPageSize)
 		{
 		}
 
-		public CollectionRangeMiddleware(OwinMiddleware next, int pageSize) : base(next)
+		public CollectionRangeMiddleware(AppFunc next, int pageSize) : base(next)
 		{
 			_pageSize = pageSize;
 		}

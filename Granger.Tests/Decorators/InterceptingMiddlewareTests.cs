@@ -9,6 +9,7 @@ using Microsoft.Owin.Testing;
 using Owin;
 using Shouldly;
 using Xunit;
+using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
 namespace Granger.Tests.Decorators
 {
@@ -108,7 +109,7 @@ namespace Granger.Tests.Decorators
 		{
 			private readonly Func<IOwinContext, MemoryStream, Task<MemoryStream>> _handle;
 
-			public TestPostInterceptMiddleware(OwinMiddleware next, Func<IOwinContext, MemoryStream, Task<MemoryStream>> handle) : base(next)
+			public TestPostInterceptMiddleware(AppFunc next, Func<IOwinContext, MemoryStream, Task<MemoryStream>> handle) : base(next)
 			{
 				_handle = handle;
 			}

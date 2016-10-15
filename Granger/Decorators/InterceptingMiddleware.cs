@@ -1,23 +1,29 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Owin;
+using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
 namespace Granger.Decorators
 {
-	public class InterceptingMiddleware : OwinMiddleware
+	public class InterceptingMiddleware
 	{
-		public InterceptingMiddleware(OwinMiddleware next) : base(next)
+		private readonly AppFunc _next;
+
+		public InterceptingMiddleware(AppFunc next)
 		{
+			_next = next;
 		}
 
-		public override async Task Invoke(IOwinContext context)
+		public async Task Invoke(IDictionary<string, object> env )
 		{
+			var context = new OwinContext(env);
 			var stream = context.Response.Body;
 			var buffer = new MemoryStream();
 
 			context.Response.Body = buffer;
 
-			await Next.Invoke(context);
+			await _next.Invoke(env);
 
 			var intercepted = await AfterNext(context, buffer);
 			intercepted.Position = 0;

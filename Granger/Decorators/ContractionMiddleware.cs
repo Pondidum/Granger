@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.Owin;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
 namespace Granger.Decorators
 {
@@ -14,11 +15,11 @@ namespace Granger.Decorators
 	{
 		private readonly string _keyField;
 
-		public ContractionMiddleware(OwinMiddleware next) : this(next, "href")
+		public ContractionMiddleware(AppFunc next) : this(next, "href")
 		{
 		}
 
-		public ContractionMiddleware(OwinMiddleware next, string keyField) : base(next)
+		public ContractionMiddleware(AppFunc next, string keyField) : base(next)
 		{
 			_keyField = keyField;
 		}

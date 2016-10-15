@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Granger.Conformity;
 using Microsoft.Owin;
 using Newtonsoft.Json.Linq;
+using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
 namespace Granger.Decorators
 {
@@ -15,12 +16,12 @@ namespace Granger.Decorators
 		private readonly UrlFinder _finder;
 		private readonly SuggestionRenderer _renderer;
 
-		public ConformityChecker(OwinMiddleware next)
+		public ConformityChecker(AppFunc next)
 			: this(next, new UrlFinder(), new SuggestionRenderer())
 		{
 		}
 
-		public ConformityChecker(OwinMiddleware next, UrlFinder finder, SuggestionRenderer renderer) : base(next)
+		public ConformityChecker(AppFunc next, UrlFinder finder, SuggestionRenderer renderer) : base(next)
 		{
 			_finder = finder;
 			_renderer = renderer;
@@ -30,7 +31,7 @@ namespace Granger.Decorators
 		{
 			var request = context.Request;
 
-			if (string.Equals(request.ContentType, "application/json", StringComparison.OrdinalIgnoreCase) == false)
+			if (string.Equals(context.Response.ContentType, "application/json", StringComparison.OrdinalIgnoreCase) == false)
 				return await base.AfterNext(context, internalMiddleware);
 
 			var content = Encoding.UTF8.GetString(internalMiddleware.ToArray());
