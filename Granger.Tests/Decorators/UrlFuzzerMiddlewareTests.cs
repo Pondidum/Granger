@@ -147,25 +147,25 @@ namespace Granger.Tests.Decorators
 			};
 		}
 
-		private interface IHref
-		{
-			string Href { get; set; }
-		}
-
-		private class Root : IHref
+		private class HrefWrapper
 		{
 			public string Href { get; set; }
-			public IHref FirstChild { get; set; }
-			public IHref LastChild { get; set; }
 		}
 
-		private class Child : IHref
+		private class Root
+		{
+			public string Href { get; set; }
+			public HrefWrapper FirstChild { get; set; }
+			public HrefWrapper LastChild { get; set; }
+		}
+
+		private class Child : HrefWrapper
 		{
 			public string Href { get; set; }
 			public string Value { get; set; }
-			public IHref Collection { get; set; }
-			public IHref Previous { get; set; }
-			public IHref Next { get; set; }
+			public HrefWrapper Collection { get; set; }
+			public HrefWrapper Previous { get; set; }
+			public HrefWrapper Next { get; set; }
 		}
 	}
 }
