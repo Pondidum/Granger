@@ -62,6 +62,7 @@
     <Compile Include="Decorators\InterceptingMiddleware.cs" />
     <Compile Include="Decorators\RequestHeaderValidator.cs" />
     <Compile Include="Decorators\ResponseHeaderValidator.cs" />
+    <Compile Include="Decorators\UrlFuzzerMiddleware.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
