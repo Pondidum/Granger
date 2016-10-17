@@ -74,9 +74,9 @@ namespace Granger.Tests.Decorators
 			var response = await Get<Root>("/");
 
 			response.ShouldSatisfyAllConditions(
-				() => response.Href.ShouldBe("/"),
-				() => response.FirstChild.Href.ShouldNotBe("/children/1"),
-				() => response.LastChild.Href.ShouldNotBe("/children/5")
+				() => response.Href.ShouldBe("http://localhost/"),
+				() => response.FirstChild.Href.ShouldNotBe("http://localhost/children/1"),
+				() => response.LastChild.Href.ShouldNotBe("http://localhost/children/5")
 			);
 		}
 
@@ -89,7 +89,7 @@ namespace Granger.Tests.Decorators
 			var root = await Get<Root>("/");
 			var c1 = await Get<Child>(root.FirstChild.Href);
 
-			c1.Href.ShouldNotBe("/children/1");
+			c1.Href.ShouldNotBe("http://localhost/children/1");
 		}
 
 		[Fact]
@@ -108,10 +108,10 @@ namespace Granger.Tests.Decorators
 				res.ContentType = "application/json";
 				await res.WriteAsync(JsonConvert.SerializeObject(new
 				{
-					href = "/",
+					href = "http://localhost/",
 					totalChildren = 5,
-					firstChild = new { href = "/children/1" },
-					lastChild = new { href = "/children/5" }
+					firstChild = new { href = "http://localhost/children/1" },
+					lastChild = new { href = "http://localhost/children/5" }
 				}));
 			};
 		}
@@ -123,10 +123,10 @@ namespace Granger.Tests.Decorators
 				res.ContentType = "application/json";
 				await res.WriteAsync(JsonConvert.SerializeObject(new
 				{
-					href = "/children/1",
+					href = "http://localhost/children/1",
 					value = "first",
-					collection = new { href = "/children" },
-					next = new { href = "/children/2" }
+					collection = new { href = "http://localhost/children" },
+					next = new { href = "http://localhost/children/2" }
 				}));
 			};
 		}
@@ -138,11 +138,11 @@ namespace Granger.Tests.Decorators
 				res.ContentType = "application/json";
 				await res.WriteAsync(JsonConvert.SerializeObject(new
 				{
-					href = "/children/2",
+					href = "http://localhost/children/2",
 					value = "second",
-					collection = new { href = "/children" },
-					previous = new { href = "/children/1" },
-					next = new { href = "/children/3" }
+					collection = new { href = "http://localhost/children" },
+					previous = new { href = "http://localhost/children/1" },
+					next = new { href = "http://localhost/children/3" }
 				}));
 			};
 		}
