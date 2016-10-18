@@ -26,18 +26,20 @@ namespace Granger.Decorators
 
 		protected override async Task<MiddlewareChain> BeforeNext(IOwinContext context)
 		{
-			var path = context.Request.Path.Value;
-			var searchPath = path == "/" ? "/" : path.TrimStart('/');
+			var fuzzedPath = context.Request.Path.Value;
 
-			var newPath = _urlMap.Where(pair => pair.Value.Equals(searchPath, StringComparison.OrdinalIgnoreCase)).ToArray();
+			if (fuzzedPath != "/")
+				fuzzedPath = fuzzedPath.TrimStart('/');
 
-			if (newPath.Any() == false)
+			var realPath = RealPathFromFuzzed(fuzzedPath);
+
+			if (string.IsNullOrWhiteSpace(realPath))
 			{
 				context.Response.StatusCode = (int)HttpStatusCode.NotFound;
 				return MiddlewareChain.Stop;
 			}
 
-			context.Request.Path = new PathString(newPath.First().Key);
+			context.Request.Path = new PathString(realPath);
 
 			return MiddlewareChain.Continue;
 		}
@@ -61,6 +63,18 @@ namespace Granger.Decorators
 			});
 
 			return new MemoryStream(Encoding.UTF8.GetBytes(result));
+		}
+
+
+		private string RealPathFromFuzzed(string fuzzed)
+		{
+			foreach (var pair in _urlMap)
+			{
+				if (pair.Value.Equals(fuzzed, StringComparison.OrdinalIgnoreCase))
+					return pair.Key;
+			}
+
+			return string.Empty;
 		}
 	}
 }
