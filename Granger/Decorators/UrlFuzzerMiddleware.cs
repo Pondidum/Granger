@@ -26,12 +26,12 @@ namespace Granger.Decorators
 
 		protected override async Task<MiddlewareChain> BeforeNext(IOwinContext context)
 		{
-			var fuzzedPath = context.Request.Path.Value;
+			var path = context.Request.Path.Value;
 
-			if (fuzzedPath != "/")
-				fuzzedPath = fuzzedPath.TrimStart('/');
+			if (path != "/")
+				path = path.TrimStart('/');
 
-			var realPath = RealPathFromFuzzed(fuzzedPath);
+			var realPath = RealPathFromFuzzed(path);
 
 			if (string.IsNullOrWhiteSpace(realPath))
 			{
