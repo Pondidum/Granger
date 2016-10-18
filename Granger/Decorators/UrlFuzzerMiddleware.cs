@@ -2,6 +2,8 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -20,6 +22,24 @@ namespace Granger.Decorators
 		{
 			_urlMap = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 			_urlMap["/"] = "/";
+		}
+
+		protected override async Task<MiddlewareChain> BeforeNext(IOwinContext context)
+		{
+			var path = context.Request.Path.Value;
+			var searchPath = path == "/" ? "/" : path.TrimStart('/');
+
+			var newPath = _urlMap.Where(pair => pair.Value.Equals(searchPath, StringComparison.OrdinalIgnoreCase)).ToArray();
+
+			if (newPath.Any() == false)
+			{
+				context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+				return MiddlewareChain.Stop;
+			}
+
+			context.Request.Path = new PathString(newPath.First().Key);
+
+			return MiddlewareChain.Continue;
 		}
 
 		protected override async Task<MemoryStream> AfterNext(IOwinContext context, MemoryStream internalMiddleware)
