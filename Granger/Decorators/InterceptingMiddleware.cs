@@ -18,6 +18,12 @@ namespace Granger.Decorators
 		public async Task Invoke(IDictionary<string, object> env )
 		{
 			var context = new OwinContext(env);
+
+			var control = await BeforeNext(context);
+
+			if (control == MiddlewareChain.Stop)
+				return;
+
 			var stream = context.Response.Body;
 			var buffer = new MemoryStream();
 
@@ -31,10 +37,22 @@ namespace Granger.Decorators
 			await intercepted.CopyToAsync(stream);
 		}
 
+		protected virtual async Task<MiddlewareChain> BeforeNext(IOwinContext context)
+		{
+			await Task.Yield();
+			return MiddlewareChain.Continue;
+		}
+
 		protected virtual async Task<MemoryStream> AfterNext(IOwinContext context, MemoryStream internalMiddleware)
 		{
 			await Task.Yield();
 			return internalMiddleware;
 		}
+	}
+
+	public enum MiddlewareChain
+	{
+		Continue,
+		Stop
 	}
 }
