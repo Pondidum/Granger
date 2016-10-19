@@ -7,6 +7,7 @@ using Granger.Decorators;
 using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Owin;
 using Shouldly;
 using Xunit;
@@ -42,28 +43,19 @@ namespace Granger.Tests.Decorators
 			});
 		}
 
-		private async Task<T> Get<T>(string path)
+		private async Task<T> Get<T>(string path, HttpStatusCode expected = HttpStatusCode.OK)
 		{
 			var response = await _server
 				.CreateRequest(path)
 				.GetAsync();
 
-			response.StatusCode.ShouldBe(HttpStatusCode.OK);
+			response.StatusCode.ShouldBe(expected);
 
 			var content = await response
 				.Content
 				.ReadAsStringAsync();
 
 			return JsonConvert.DeserializeObject<T>(content);
-		}
-
-		private async Task AttemptGet(string path)
-		{
-			var response = await _server
-				.CreateRequest(path)
-				.GetAsync();
-
-			response.StatusCode.ShouldNotBe(HttpStatusCode.OK);
 		}
 
 		[Fact]
@@ -98,7 +90,11 @@ namespace Granger.Tests.Decorators
 			RootUrlHandler();
 			ChildOneHandler();
 
-			await AttemptGet("/children/1");
+			var root = await Get<Root>("/");
+			var response = await Get<JToken>("/children/1", HttpStatusCode.NotFound);
+
+			response.Value<string>("RequestedPath").ShouldBe("/children/1");
+			response.Value<string>("SuggestedPath").ShouldBe(new Uri(root.FirstChild.Href).PathAndQuery.TrimStart('/'));
 		}
 
 		private void RootUrlHandler()
@@ -161,7 +157,6 @@ namespace Granger.Tests.Decorators
 
 		private class Child : HrefWrapper
 		{
-			public string Href { get; set; }
 			public string Value { get; set; }
 			public HrefWrapper Collection { get; set; }
 			public HrefWrapper Previous { get; set; }

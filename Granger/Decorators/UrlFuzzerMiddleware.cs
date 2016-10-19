@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Microsoft.Owin;
+using Newtonsoft.Json;
 using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, object>, System.Threading.Tasks.Task>;
 
 namespace Granger.Decorators
@@ -26,7 +27,8 @@ namespace Granger.Decorators
 
 		protected override async Task<MiddlewareChain> BeforeNext(IOwinContext context)
 		{
-			var path = context.Request.Path.Value;
+			var originalPath = context.Request.Path.Value;
+			var path = originalPath;
 
 			if (path != "/")
 				path = path.TrimStart('/');
@@ -36,6 +38,13 @@ namespace Granger.Decorators
 			if (string.IsNullOrWhiteSpace(realPath))
 			{
 				context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+				await context.Response.WriteAsync(JsonConvert.SerializeObject(new
+				{
+					Message = "You must follow hrefs in responses from the api, rather than going directly to an endpoint.",
+					RequestedPath = originalPath,
+					SuggestedPath = _urlMap.ContainsKey(originalPath) ? _urlMap[originalPath] : ""
+				}));
+
 				return MiddlewareChain.Stop;
 			}
 
