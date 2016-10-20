@@ -16,7 +16,7 @@ namespace Granger.Tests.Decorators
 {
 	public class UrlFuzzerMiddlewareTests
 	{
-		private readonly TestServer _server;
+		private readonly Lazy<TestServer> _server;
 		private readonly Dictionary<string, Func<IOwinRequest, IOwinResponse, Task>> _handlers;
 		private readonly List<string> _whitelist;
 
@@ -24,7 +24,7 @@ namespace Granger.Tests.Decorators
 		{
 			_whitelist = new List<string>();
 			_handlers = new Dictionary<string, Func<IOwinRequest, IOwinResponse, Task>>();
-			_server = TestServer.Create(app =>
+			_server = new Lazy<TestServer>(() => TestServer.Create(app =>
 			{
 				app.Use<UrlFuzzerMiddleware>(_whitelist);
 				app.Run(async context =>
@@ -42,12 +42,13 @@ namespace Granger.Tests.Decorators
 
 					context.Response.StatusCode = (int)HttpStatusCode.NotFound;
 				});
-			});
+			}));
 		}
 
 		private async Task<T> Get<T>(string path, HttpStatusCode expected = HttpStatusCode.OK)
 		{
 			var response = await _server
+				.Value
 				.CreateRequest(path)
 				.GetAsync();
 
@@ -95,7 +96,7 @@ namespace Granger.Tests.Decorators
 			var root = await Get<Root>("/");
 			var response = await Get<JToken>("/children/1", HttpStatusCode.NotFound);
 
-			var expectedSuggestion = new Uri(root.FirstChild.Href).PathAndQuery.TrimStart('/');
+			var expectedSuggestion = new Uri(root.FirstChild.Href).PathAndQuery;
 
 			response.Value<string>("RequestedPath").ShouldBe("/children/1");
 			response.Value<string>("SuggestedPath").ShouldBe(expectedSuggestion);
@@ -112,8 +113,8 @@ namespace Granger.Tests.Decorators
 			var root = await Get<Root>("/");
 			var child = await Get<Child>("/children/1");
 
-			root.FirstChild.Href.ShouldBe("/children/1");
-			child.Href.ShouldBe("/children/1");
+			root.FirstChild.Href.ShouldBe("http://localhost/children/1");
+			child.Href.ShouldBe("http://localhost/children/1");
 		}
 
 		private void RootUrlHandler()

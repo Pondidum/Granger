@@ -19,21 +19,23 @@ namespace Granger.Decorators
 
 		private readonly ConcurrentDictionary<string, string> _urlMap;
 
-		public UrlFuzzerMiddleware(AppFunc next) : base(next)
+		public UrlFuzzerMiddleware(AppFunc next) : this(next, Enumerable.Empty<string>())
+		{
+		}
+
+		public UrlFuzzerMiddleware(AppFunc next, IEnumerable<string> whitelist) : base(next)
 		{
 			_urlMap = new ConcurrentDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 			_urlMap["/"] = "/";
+
+			foreach (var url in whitelist)
+				_urlMap[url] = url;
 		}
 
 		protected override async Task<MiddlewareChain> BeforeNext(IOwinContext context)
 		{
 			var originalPath = context.Request.Path.Value;
-			var path = originalPath;
-
-			if (path != "/")
-				path = path.TrimStart('/');
-
-			var realPath = RealPathFromFuzzed(path);
+			var realPath = RealPathFromFuzzed(originalPath);
 
 			if (string.IsNullOrWhiteSpace(realPath))
 			{
@@ -65,7 +67,7 @@ namespace Granger.Decorators
 				var url = new Uri(match.Groups[1].Value);
 				var builder = new UriBuilder(url);
 
-				var newPath = _urlMap.GetOrAdd(builder.Path, key => Guid.NewGuid().ToString());
+				var newPath = _urlMap.GetOrAdd(builder.Path, key => "/" + Guid.NewGuid().ToString());
 				builder.Path = newPath;
 
 				return $"\"href\":\"{builder.Uri}\"";
