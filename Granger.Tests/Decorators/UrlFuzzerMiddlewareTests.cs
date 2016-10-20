@@ -18,13 +18,15 @@ namespace Granger.Tests.Decorators
 	{
 		private readonly TestServer _server;
 		private readonly Dictionary<string, Func<IOwinRequest, IOwinResponse, Task>> _handlers;
+		private readonly List<string> _whitelist;
 
 		public UrlFuzzerMiddlewareTests()
 		{
+			_whitelist = new List<string>();
 			_handlers = new Dictionary<string, Func<IOwinRequest, IOwinResponse, Task>>();
 			_server = TestServer.Create(app =>
 			{
-				app.Use<UrlFuzzerMiddleware>();
+				app.Use<UrlFuzzerMiddleware>(_whitelist);
 				app.Run(async context =>
 				{
 					var request = context.Request;
@@ -93,8 +95,25 @@ namespace Granger.Tests.Decorators
 			var root = await Get<Root>("/");
 			var response = await Get<JToken>("/children/1", HttpStatusCode.NotFound);
 
+			var expectedSuggestion = new Uri(root.FirstChild.Href).PathAndQuery.TrimStart('/');
+
 			response.Value<string>("RequestedPath").ShouldBe("/children/1");
-			response.Value<string>("SuggestedPath").ShouldBe(new Uri(root.FirstChild.Href).PathAndQuery.TrimStart('/'));
+			response.Value<string>("SuggestedPath").ShouldBe(expectedSuggestion);
+		}
+
+		[Fact]
+		public async Task When_a_non_fuzzed_but_whitelisted_url_is_followed()
+		{
+			_whitelist.Add("/children/1");
+
+			RootUrlHandler();
+			ChildOneHandler();
+
+			var root = await Get<Root>("/");
+			var child = await Get<Child>("/children/1");
+
+			root.FirstChild.Href.ShouldBe("/children/1");
+			child.Href.ShouldBe("/children/1");
 		}
 
 		private void RootUrlHandler()
