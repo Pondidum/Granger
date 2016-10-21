@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Granger.Decorators;
 using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Newtonsoft.Json;
@@ -26,7 +24,7 @@ namespace Granger.Tests.Decorators
 			_handlers = new Dictionary<string, Func<IOwinRequest, IOwinResponse, Task>>();
 			_server = new Lazy<TestServer>(() => TestServer.Create(app =>
 			{
-				app.Use<UrlFuzzerMiddleware>(_whitelist);
+				app.UseUrlFuzzer(_whitelist);
 				app.Run(async context =>
 				{
 					var request = context.Request;

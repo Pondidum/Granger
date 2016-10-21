@@ -17,14 +17,14 @@ namespace Granger.Decorators
 		private readonly SuggestionRenderer _renderer;
 
 		public ConformityChecker(AppFunc next)
-			: this(next, new UrlFinder(), new SuggestionRenderer())
+			: this(next, null, null)
 		{
 		}
 
 		public ConformityChecker(AppFunc next, UrlFinder finder, SuggestionRenderer renderer) : base(next)
 		{
-			_finder = finder;
-			_renderer = renderer;
+			_finder = finder ?? new UrlFinder();
+			_renderer = renderer ?? new SuggestionRenderer();
 		}
 
 		protected override async Task<MemoryStream> AfterNext(IOwinContext context, MemoryStream internalMiddleware)

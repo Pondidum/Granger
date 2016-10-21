@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Net;
 using System.Threading.Tasks;
-using Granger.Decorators;
 using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Newtonsoft.Json.Linq;
@@ -21,7 +20,7 @@ namespace Granger.Tests.Decorators
 			_configureResponse = response => { };
 			_server = TestServer.Create(app =>
 			{
-				app.Use<ResponseHeaderValidator>();
+				app.UseResponseHeaderValidator();
 				app.Run(async context =>
 				{
 					_configureResponse(context.Response);

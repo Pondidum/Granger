@@ -20,7 +20,7 @@ namespace Granger.Tests.Decorators
 		{
 			Action<IAppBuilder> host = app =>
 			{
-				app.Use<ContractionMiddleware>(key);
+				app.UseContractionMiddleware(key);
 
 				app.Run(async context =>
 				{

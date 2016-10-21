@@ -1,8 +1,5 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Threading.Tasks;
-using Granger.Decorators;
-using Microsoft.Owin;
 using Microsoft.Owin.Testing;
 using Newtonsoft.Json.Linq;
 using Owin;
@@ -19,7 +16,7 @@ namespace Granger.Tests.Decorators
 		{
 			_server = TestServer.Create(app =>
 			{
-				app.Use<RequestHeaderValidator>();
+				app.UseRequestHeaderValidator();
 				app.Run(async context =>
 				{
 					await Task.Yield();

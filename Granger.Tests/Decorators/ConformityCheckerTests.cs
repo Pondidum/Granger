@@ -33,7 +33,7 @@ namespace Granger.Tests.Decorators
 
 			_server = TestServer.Create(app =>
 			{
-				app.Use<ConformityChecker>(_finder, _renderer);
+				app.UseConformityChecker(_finder, _renderer);
 				app.Run(async context =>
 				{
 					_controllerResponse(context.Response);
