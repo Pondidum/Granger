@@ -25,7 +25,7 @@ namespace Granger
 
 		public static IAppBuilder UseHttpMethodOverride(this IAppBuilder appBuilder, IEnumerable<string> allowedMethods = null)
 		{
-			return allowedMethods == null 
+			return allowedMethods == null
 				? appBuilder.Use<HttpMethodOverride>()
 				: appBuilder.Use<HttpMethodOverride>(allowedMethods);
 		}
@@ -40,6 +40,13 @@ namespace Granger
 		public static IAppBuilder UseConformityChecker(this IAppBuilder appBuilder, UrlFinder finder = null, SuggestionRenderer renderer = null)
 		{
 			return appBuilder.Use<ConformityChecker>(finder, renderer);
+		}
+
+		public static IAppBuilder UseCollectionRange(this IAppBuilder appBuilder, int? defaultPageSize = null)
+		{
+			return defaultPageSize.HasValue
+				? appBuilder.Use<CollectionRangeMiddleware>(defaultPageSize)
+				: appBuilder.Use<CollectionRangeMiddleware>();
 		}
 
 	}

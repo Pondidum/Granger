@@ -22,7 +22,7 @@ namespace Granger.Tests.Decorators
 		{
 			_server = TestServer.Create(app =>
 			{
-				app.Use<CollectionRangeMiddleware>();
+				app.UseCollectionRange();
 				app.Run(async context =>
 				{
 					handle(context.Response);
@@ -35,7 +35,7 @@ namespace Granger.Tests.Decorators
 		{
 			_server = TestServer.Create(app =>
 			{
-				app.Use<CollectionRangeMiddleware>(pageSize);
+				app.UseCollectionRange(pageSize);
 				app.Run(async context =>
 				{
 					handle(context.Response);
