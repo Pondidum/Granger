@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Granger.Tests.Decorators
 {
-	public class HttpMethodOverrideTests : IDisposable
+	public class HttpMethodOverrideMiddlewareTests : IDisposable
 	{
 		private TestServer _server;
 		private IOwinRequest _request;

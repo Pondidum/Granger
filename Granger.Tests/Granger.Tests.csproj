@@ -87,12 +87,12 @@
     <Compile Include="Conformity\SuggestionRendererTests.cs" />
     <Compile Include="Conformity\UrlFinderTests.cs" />
     <Compile Include="Decorators\CollectionRangeMiddlewareTests.cs" />
-    <Compile Include="Decorators\ConformityCheckerTests.cs" />
+    <Compile Include="Decorators\ConformityCheckerMiddlewareTests.cs" />
     <Compile Include="Decorators\ContractionMiddlewareTests.cs" />
-    <Compile Include="Decorators\HttpMethodOverrideTests.cs" />
+    <Compile Include="Decorators\HttpMethodOverrideMiddlewareTests.cs" />
     <Compile Include="Decorators\InterceptingMiddlewareTests.cs" />
-    <Compile Include="Decorators\RequestHeaderValidatorTests.cs" />
-    <Compile Include="Decorators\ResponseHeaderValidatorTests.cs" />
+    <Compile Include="Decorators\RequestHeaderValidatorMiddlewareTests.cs" />
+    <Compile Include="Decorators\ResponseHeaderValidatorMiddlewareTests.cs" />
     <Compile Include="Decorators\UrlFuzzerMiddlewareTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Scratchpad.cs" />

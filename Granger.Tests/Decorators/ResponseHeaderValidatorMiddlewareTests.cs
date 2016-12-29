@@ -10,12 +10,12 @@ using Xunit;
 
 namespace Granger.Tests.Decorators
 {
-	public class ResponseHeaderValidatorTests
+	public class ResponseHeaderValidatorMiddlewareTests
 	{
 		private Action<IOwinResponse> _configureResponse;
 		private readonly TestServer _server;
 
-		public ResponseHeaderValidatorTests()
+		public ResponseHeaderValidatorMiddlewareTests()
 		{
 			_configureResponse = response => { };
 			_server = TestServer.Create(app =>

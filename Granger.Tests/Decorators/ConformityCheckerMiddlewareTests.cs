@@ -19,14 +19,14 @@ using Xunit;
 
 namespace Granger.Tests.Decorators
 {
-	public class ConformityCheckerTests : IDisposable
+	public class ConformityCheckerMiddlewareTests : IDisposable
 	{
 		private Action<IOwinResponse> _controllerResponse;
 		private readonly TestServer _server;
 		private readonly UrlFinder _finder;
 		private readonly SuggestionRenderer _renderer;
 
-		public ConformityCheckerTests()
+		public ConformityCheckerMiddlewareTests()
 		{
 			_finder = Substitute.For<UrlFinder>();
 			_renderer = Substitute.For<SuggestionRenderer>();

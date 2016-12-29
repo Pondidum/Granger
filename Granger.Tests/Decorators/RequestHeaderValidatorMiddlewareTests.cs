@@ -8,11 +8,11 @@ using Xunit;
 
 namespace Granger.Tests.Decorators
 {
-	public class RequestHeaderValidatorTests
+	public class RequestHeaderValidatorMiddlewareTests
 	{
 		private readonly TestServer _server;
 
-		public RequestHeaderValidatorTests()
+		public RequestHeaderValidatorMiddlewareTests()
 		{
 			_server = TestServer.Create(app =>
 			{
