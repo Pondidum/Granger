@@ -32,7 +32,7 @@ namespace Granger.Tests.Decorators
 		{
 			_server = TestServer.Create(app =>
 			{
-				app.Use<HttpMethodOverride>(new object[] { methods });
+				app.Use<HttpMethodOverrideMiddleware>(new object[] { methods });
 
 				app.Run(async context =>
 				{

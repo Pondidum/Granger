@@ -56,12 +56,12 @@
     <Compile Include="Conformity\SuggestionRenderer.cs" />
     <Compile Include="Conformity\UrlFinder.cs" />
     <Compile Include="Decorators\CollectionRangeMiddleware.cs" />
-    <Compile Include="Decorators\ConformityChecker.cs" />
+    <Compile Include="Decorators\ConformityCheckerMiddleware.cs" />
     <Compile Include="Decorators\ContractionMiddleware.cs" />
-    <Compile Include="Decorators\HttpMethodOverride.cs" />
+    <Compile Include="Decorators\HttpMethodOverrideMiddleware.cs" />
     <Compile Include="Decorators\InterceptingMiddleware.cs" />
-    <Compile Include="Decorators\RequestHeaderValidator.cs" />
-    <Compile Include="Decorators\ResponseHeaderValidator.cs" />
+    <Compile Include="Decorators\RequestHeaderValidatorMiddleware.cs" />
+    <Compile Include="Decorators\ResponseHeaderValidatorMiddleware.cs" />
     <Compile Include="Decorators\UrlFuzzerMiddleware.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

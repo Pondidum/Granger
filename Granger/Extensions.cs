@@ -15,19 +15,19 @@ namespace Granger
 
 		public static IAppBuilder UseResponseHeaderValidator(this IAppBuilder appBuilder)
 		{
-			return appBuilder.Use<ResponseHeaderValidator>();
+			return appBuilder.Use<ResponseHeaderValidatorMiddleware>();
 		}
 
 		public static IAppBuilder UseRequestHeaderValidator(this IAppBuilder appBuilder)
 		{
-			return appBuilder.Use<RequestHeaderValidator>();
+			return appBuilder.Use<RequestHeaderValidatorMiddleware>();
 		}
 
 		public static IAppBuilder UseHttpMethodOverride(this IAppBuilder appBuilder, IEnumerable<string> allowedMethods = null)
 		{
 			return allowedMethods == null
-				? appBuilder.Use<HttpMethodOverride>()
-				: appBuilder.Use<HttpMethodOverride>(allowedMethods);
+				? appBuilder.Use<HttpMethodOverrideMiddleware>()
+				: appBuilder.Use<HttpMethodOverrideMiddleware>(allowedMethods);
 		}
 
 		public static IAppBuilder UseContractionMiddleware(this IAppBuilder appBuilder, string key = null)
@@ -39,7 +39,7 @@ namespace Granger
 
 		public static IAppBuilder UseConformityChecker(this IAppBuilder appBuilder, UrlFinder finder = null, SuggestionRenderer renderer = null)
 		{
-			return appBuilder.Use<ConformityChecker>(finder, renderer);
+			return appBuilder.Use<ConformityCheckerMiddleware>(finder, renderer);
 		}
 
 		public static IAppBuilder UseCollectionRange(this IAppBuilder appBuilder, int? defaultPageSize = null)

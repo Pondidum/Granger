@@ -11,17 +11,17 @@ using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, objec
 
 namespace Granger.Decorators
 {
-	public class ConformityChecker : InterceptingMiddleware
+	public class ConformityCheckerMiddleware : InterceptingMiddleware
 	{
 		private readonly UrlFinder _finder;
 		private readonly SuggestionRenderer _renderer;
 
-		public ConformityChecker(AppFunc next)
+		public ConformityCheckerMiddleware(AppFunc next)
 			: this(next, null, null)
 		{
 		}
 
-		public ConformityChecker(AppFunc next, UrlFinder finder, SuggestionRenderer renderer) : base(next)
+		public ConformityCheckerMiddleware(AppFunc next, UrlFinder finder, SuggestionRenderer renderer) : base(next)
 		{
 			_finder = finder ?? new UrlFinder();
 			_renderer = renderer ?? new SuggestionRenderer();

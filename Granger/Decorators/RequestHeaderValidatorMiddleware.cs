@@ -7,11 +7,11 @@ using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, objec
 
 namespace Granger.Decorators
 {
-	public class RequestHeaderValidator
+	public class RequestHeaderValidatorMiddleware
 	{
 		private readonly AppFunc _next;
 
-		public RequestHeaderValidator(AppFunc next)
+		public RequestHeaderValidatorMiddleware(AppFunc next)
 		{
 			_next = next;
 		}

@@ -9,7 +9,7 @@ using AppFunc = System.Func<System.Collections.Generic.IDictionary<string, objec
 
 namespace Granger.Decorators
 {
-	public class HttpMethodOverride
+	public class HttpMethodOverrideMiddleware
 	{
 		private static readonly string[] DefaultMethods = new[]
 		{
@@ -23,11 +23,11 @@ namespace Granger.Decorators
 		private readonly AppFunc _next;
 		private readonly HashSet<string> _allowedMethods;
 
-		public HttpMethodOverride(AppFunc next) : this(next, DefaultMethods)
+		public HttpMethodOverrideMiddleware(AppFunc next) : this(next, DefaultMethods)
 		{
 		}
 
-		public HttpMethodOverride(AppFunc next, IEnumerable<string> allowedMethods)
+		public HttpMethodOverrideMiddleware(AppFunc next, IEnumerable<string> allowedMethods)
 		{
 			_next = next;
 			_allowedMethods = new HashSet<string>(allowedMethods, StringComparer.OrdinalIgnoreCase);
