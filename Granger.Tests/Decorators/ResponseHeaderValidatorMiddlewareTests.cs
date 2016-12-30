@@ -38,6 +38,7 @@ namespace Granger.Tests.Decorators
 
 			response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
 			content["Message"].ShouldBe("The response was missing a recommend header: Content-Type");
+			content["Links"]["rfc"]["href"].ShouldBe("https://tools.ietf.org/html/rfc2616#section-7.2.1");
 		}
 
 		[Fact]
