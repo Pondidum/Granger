@@ -21,24 +21,42 @@ namespace Granger.Decorators
 			await _next.Invoke(environment);
 
 			var context = new OwinContext(environment);
+			var response = context.Response;
 
-			if (string.IsNullOrWhiteSpace(context.Response.ContentType))
+			if (string.IsNullOrWhiteSpace(response.ContentType))
 			{
-				var response = context.Response;
-
-				response.StatusCode = (int)HttpStatusCode.InternalServerError;
-				response.ContentType = "application/json";
-
 				var json = JsonConvert.SerializeObject(new
 				{
 					Message = "The response was missing a recommend header: Content-Type",
 					Links = new Dictionary<string, HrefWrapper>
 					{
-						{ "rfc", new HrefWrapper { href = "https://tools.ietf.org/html/rfc2616#section-7.2.1" }}
+						{ "rfc", new HrefWrapper { href = "https://tools.ietf.org/html/rfc2616#section-7.2.1" } }
 					}
 				});
 
+				response.StatusCode = (int)HttpStatusCode.InternalServerError;
+				response.ContentType = "application/json";
+
 				await response.WriteAsync(json);
+				return;
+			}
+
+			if (response.StatusCode == (int)HttpStatusCode.Created && response.Headers.ContainsKey("Location") == false)
+			{
+				var json = JsonConvert.SerializeObject(new
+				{
+					Message = "The response was missing a recommend header: Location",
+					Links = new Dictionary<string, HrefWrapper>
+					{
+						{ "rfc", new HrefWrapper { href = "https://tools.ietf.org/html/rfc7231#section-6.3.2" } }
+					}
+				});
+
+				response.StatusCode = (int)HttpStatusCode.InternalServerError;
+				response.ContentType = "application/json";
+
+				await response.WriteAsync(json);
+				return;
 			}
 
 			await Task.Yield();
