@@ -35,7 +35,7 @@ namespace Granger.Tests.Decorators
 		{
 			var response = await _server.CreateRequest("resource").GetAsync();
 			var json = await response.Content.ReadAsStringAsync();
-			var content = JToken.Parse(json);
+			var content = JArray.Parse(json).First;
 
 			response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
 			content["Message"].ShouldBe("The response was missing a recommend header: Content-Type");
@@ -81,7 +81,7 @@ namespace Granger.Tests.Decorators
 
 			var response = await _server.CreateRequest("resource").GetAsync();
 			var json = await response.Content.ReadAsStringAsync();
-			var content = JToken.Parse(json);
+			var content = JArray.Parse(json).First;
 
 			response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
 			content["Message"].ShouldBe("The response was missing a recommend header: Location");
