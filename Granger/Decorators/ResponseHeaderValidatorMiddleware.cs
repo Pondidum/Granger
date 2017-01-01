@@ -20,7 +20,7 @@ namespace Granger.Decorators
 			_next = next;
 			_rules = new List<IResponseRule>
 			{
-				new ContentTypeRule(),
+				new HttpRequiredHeaders(),
 				new Http201Location()
 			};
 		}

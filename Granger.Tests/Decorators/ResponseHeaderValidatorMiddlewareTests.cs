@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using Microsoft.Owin;
@@ -16,6 +17,9 @@ namespace Granger.Tests.Decorators
 		private Action<IOwinResponse> _configureResponse;
 		private readonly TestServer _server;
 
+		private JToken _content;
+		private HttpResponseMessage _response;
+
 		public ResponseHeaderValidatorMiddlewareTests()
 		{
 			_configureResponse = response => { };
@@ -24,34 +28,60 @@ namespace Granger.Tests.Decorators
 				app.UseResponseHeaderValidator();
 				app.Run(async context =>
 				{
+					context.Response.Headers["Date"] = DateTime.UtcNow.ToString("r");
+					context.Response.Headers["Server"] = "TestHost";
+					context.Response.ContentLength = 0;
+					context.Response.ContentType = "application/json";
+
 					_configureResponse(context.Response);
+
 					await Task.Yield();
 				});
 			});
 		}
 
-		[Fact]
-		public async Task When_the_response_has_no_content_type()
+		private async Task GetResponse()
 		{
 			var response = await _server.CreateRequest("resource").GetAsync();
 			var json = await response.Content.ReadAsStringAsync();
-			var content = JArray.Parse(json).First;
 
-			response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
-			content["Message"].ShouldBe("The response was missing a recommend header: Content-Type");
-			content["Links"]["rfc"]["href"].ShouldBe("https://tools.ietf.org/html/rfc2616#section-7.2.1");
+			_content = JArray.Parse(json).First;
+			_response = response;
+
+		}
+
+		private async Task CheckFor(string header)
+		{
+			_configureResponse = res => res.Headers[header] = null;
+
+			await GetResponse();
+
+			_response.StatusCode.ShouldBe(HttpStatusCode.InternalServerError);
+
+			_content["Message"].ShouldBe($"The response was missing a recommend header: {header}");
+			_content["Links"]["rfc"]["href"].ShouldNotBeNull();
 		}
 
 		[Fact]
-		public async Task When_the_response_has_a_content_type()
+		public async Task When_the_response_has_all_headers()
 		{
-			_configureResponse = res => res.ContentType = "application/json";
-
 			var response = await _server.CreateRequest("resource").GetAsync();
 			var content = await response.Content.ReadAsStringAsync();
 
 			content.ShouldBe("");
 		}
+
+		[Fact]
+		public async Task When_missing_content_type_header() => await CheckFor("Content-Type");
+
+		[Fact]
+		public async Task When_missing_server_header() => await CheckFor("Server");
+
+		[Fact]
+		public async Task When_missing_the_content_length_header() => await CheckFor("Content-Length");
+
+		[Fact]
+		public async Task When_missing_the_date_header() => await CheckFor("Date");
 
 		[Fact]
 		public async Task When_the_response_is_201_and_has_a_location_header()

@@ -69,6 +69,7 @@
     <Compile Include="ResponseHeaderValidation\IResponseRule.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\ContentTypeRule.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\Http201Location.cs" />
+    <Compile Include="ResponseHeaderValidation\Rules\HttpRequiredHeaders.cs" />
     <Compile Include="ResponseHeaderValidation\Violation.cs" />
   </ItemGroup>
   <ItemGroup>
