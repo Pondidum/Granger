@@ -10,12 +10,6 @@ namespace Granger.ResponseHeaderValidation.Rules
 		{
 			var headers = response.Headers;
 
-			if (headers.ContainsKey("Date") == false)
-				yield return ViolationFor("Date", "https://tools.ietf.org/html/rfc7231#section-7.1.1.2");
-
-			if (headers.ContainsKey("Server") == false)
-				yield return ViolationFor("Server", "https://tools.ietf.org/html/rfc7231#section-7.4.2");
-
 			if (headers.ContainsKey("Content-Length") == false)
 				yield return ViolationFor("Content-Length", "https://tools.ietf.org/html/rfc7230#section-3.3.2");
 

@@ -28,8 +28,6 @@ namespace Granger.Tests.Decorators
 				app.UseResponseHeaderValidator();
 				app.Run(async context =>
 				{
-					context.Response.Headers["Date"] = DateTime.UtcNow.ToString("r");
-					context.Response.Headers["Server"] = "TestHost";
 					context.Response.ContentLength = 0;
 					context.Response.ContentType = "application/json";
 
@@ -75,13 +73,7 @@ namespace Granger.Tests.Decorators
 		public async Task When_missing_content_type_header() => await CheckFor("Content-Type");
 
 		[Fact]
-		public async Task When_missing_server_header() => await CheckFor("Server");
-
-		[Fact]
 		public async Task When_missing_the_content_length_header() => await CheckFor("Content-Length");
-
-		[Fact]
-		public async Task When_missing_the_date_header() => await CheckFor("Date");
 
 		[Fact]
 		public async Task When_the_response_is_201_and_has_a_location_header()
