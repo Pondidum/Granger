@@ -5,7 +5,7 @@ using Microsoft.Owin;
 
 namespace Granger.ResponseHeaderValidation.Rules
 {
-	public class Http201Location : IResponseRule
+	public class Http201Rule : IResponseRule
 	{
 		public IEnumerable<Violation> GetViolations(IOwinResponse response)
 		{
