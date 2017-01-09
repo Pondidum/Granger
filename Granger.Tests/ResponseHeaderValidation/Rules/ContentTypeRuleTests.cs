@@ -11,23 +11,16 @@ namespace Granger.Tests.ResponseHeaderValidation.Rules
 	{
 		protected override IResponseRule CreateRule() => new ContentTypeRule();
 
-		[Fact]
-		public void When_there_is_no_content_type()
+		protected override void Before()
 		{
-			var violation = GetViolations().Single();
-
-			violation.ShouldSatisfyAllConditions(
-				() => violation.Message.ShouldEndWith("Content-Type"),
-				() => violation.Links.ShouldContainKey("rfc")
-			);
+			Response.Headers["Content-Type"] = "application/json";
 		}
 
-		[Fact]
-		public void When_there_is_a_content_type()
+		[Theory]
+		[InlineData("Content-Type")]
+		public override void When_testing_headers(string header)
 		{
-			Response.ContentType.Returns("application/json");
-
-			GetViolations().ShouldBeEmpty();
+			TestHeader(header);
 		}
 	}
 }

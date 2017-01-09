@@ -10,25 +10,18 @@ namespace Granger.Tests.ResponseHeaderValidation.Rules
 	public class Http201RuleTests : RuleTestFor<Http201Rule>
 	{
 		protected override IResponseRule CreateRule() => new Http201Rule();
-		protected override void Before() => Response.StatusCode = (int)HttpStatusCode.Created;
 
-		[Fact]
-		public void When_there_is_no_location_header()
+		protected override void Before()
 		{
-			var violation = GetViolations().Single();
-
-			violation.ShouldSatisfyAllConditions(
-				() => violation.Message.ShouldEndWith("Location"),
-				() => violation.Links.ShouldContainKey("rfc")
-			);
+			Response.StatusCode = (int)HttpStatusCode.Created;
+			Response.Headers["Location"] = "http://example.com";
 		}
 
-		[Fact]
-		public void When_there_is_a_location_header()
+		[Theory]
+		[InlineData("Location")]
+		public override void When_testing_headers(string header)
 		{
-			Response.Headers["Location"] = "http://example.com";
-
-			GetViolations().ShouldBeEmpty();
+			TestHeader(header);
 		}
 	}
 }
