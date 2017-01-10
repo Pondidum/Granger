@@ -9,7 +9,7 @@ namespace Granger.Tests.ResponseHeaderValidation.Rules
 {
 	public class ContentTypeRuleTests : RuleTestFor<ContentTypeRule>
 	{
-		protected override IResponseRule CreateRule() => new ContentTypeRule();
+		protected override ContentTypeRule CreateRule() => new ContentTypeRule();
 
 		protected override void Before()
 		{

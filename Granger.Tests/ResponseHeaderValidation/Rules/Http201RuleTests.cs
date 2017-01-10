@@ -9,7 +9,7 @@ namespace Granger.Tests.ResponseHeaderValidation.Rules
 {
 	public class Http201RuleTests : RuleTestFor<Http201Rule>
 	{
-		protected override IResponseRule CreateRule() => new Http201Rule();
+		protected override Http201Rule CreateRule() => new Http201Rule();
 
 		protected override void Before()
 		{

@@ -11,7 +11,7 @@ namespace Granger.Tests.ResponseHeaderValidation.Rules
 {
 	public class HttpRequiredHeadersRuleTests : RuleTestFor<HttpRequiredHeadersRule>
 	{
-		protected override IResponseRule CreateRule() => new HttpRequiredHeadersRule();
+		protected override HttpRequiredHeadersRule CreateRule() => new HttpRequiredHeadersRule();
 
 		protected override void Before()
 		{

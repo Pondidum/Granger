@@ -13,7 +13,7 @@ namespace Granger.Tests.ResponseHeaderValidation.Rules
 	public abstract class RuleTestFor<TRule>
 		where TRule : IResponseRule
 	{
-		private readonly IResponseRule _rule;
+		private readonly TRule _rule;
 		protected IOwinResponse Response { get; }
 
 		protected RuleTestFor()
@@ -29,7 +29,7 @@ namespace Granger.Tests.ResponseHeaderValidation.Rules
 			Response.ContentLength.Returns(ci => int.Parse(Response.Headers["Content-Type"]));
 		}
 
-		protected abstract IResponseRule CreateRule();
+		protected abstract TRule CreateRule();
 
 		protected virtual void Before()
 		{
