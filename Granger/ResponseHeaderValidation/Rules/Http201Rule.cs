@@ -10,14 +10,10 @@ namespace Granger.ResponseHeaderValidation.Rules
 		public IEnumerable<Violation> GetViolations(IOwinResponse response)
 		{
 			if (response.StatusCode == (int)HttpStatusCode.Created && response.Headers.ContainsKey("Location") == false)
-				yield return new Violation
-				{
-					Message = "The response was missing a recommend header: Location",
-					Links = new Dictionary<string, HrefWrapper>
-					{
-						{ "rfc", new HrefWrapper { Href = new Uri("https://tools.ietf.org/html/rfc7231#section-6.3.2") } }
-					}
-				};
+				yield return Violation.ForHttpHeader(
+					"Location",
+					new Uri("https://tools.ietf.org/html/rfc7231#section-6.3.2")
+				);
 		}
 	}
 }

@@ -9,14 +9,10 @@ namespace Granger.ResponseHeaderValidation.Rules
 		public IEnumerable<Violation> GetViolations(IOwinResponse response)
 		{
 			if (string.IsNullOrWhiteSpace(response.ContentType))
-				yield return new Violation
-				{
-					Message = "The response was missing a recommend header: Content-Type",
-					Links = new Dictionary<string, HrefWrapper>
-					{
-						{ "rfc", new HrefWrapper { Href = new Uri("https://tools.ietf.org/html/rfc2616#section-7.2.1") } }
-					}
-				};
+				yield return Violation.ForHttpHeader(
+					"Content-Type",
+					new Uri("https://tools.ietf.org/html/rfc2616#section-7.2.1")
+				);
 		}
 	}
 }
