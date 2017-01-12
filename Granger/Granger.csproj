@@ -67,7 +67,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseHeaderValidation\HrefWrapper.cs" />
     <Compile Include="ResponseHeaderValidation\IResponseRule.cs" />
-    <Compile Include="ResponseHeaderValidation\Rules\ContentTypeRule.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\Http101Rule.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\Http201Rule.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\HttpRequiredHeadersRule.cs" />

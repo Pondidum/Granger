@@ -95,7 +95,6 @@
     <Compile Include="Decorators\ResponseHeaderValidatorMiddlewareTests.cs" />
     <Compile Include="Decorators\UrlFuzzerMiddlewareTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ResponseHeaderValidation\Rules\ContentTypeRuleTests.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\Http101RuleTests.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\Http201RuleTests.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\HttpRequiredHeadersRuleTests.cs" />
