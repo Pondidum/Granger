@@ -7,7 +7,7 @@ using Xunit;
 
 namespace Granger.Tests.ResponseHeaderValidation.Rules
 {
-	public class Http201RuleTests : RuleTestFor<Http201Rule>
+	public class Http201RuleTests : RuleTestForHeader<Http201Rule>
 	{
 		protected override Http201Rule CreateRule() => new Http201Rule();
 

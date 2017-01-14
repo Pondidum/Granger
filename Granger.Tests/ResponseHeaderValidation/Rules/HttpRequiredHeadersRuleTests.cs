@@ -9,7 +9,7 @@ using Xunit;
 
 namespace Granger.Tests.ResponseHeaderValidation.Rules
 {
-	public class HttpRequiredHeadersRuleTests : RuleTestFor<HttpRequiredHeadersRule>
+	public class HttpRequiredHeadersRuleTests : RuleTestForHeader<HttpRequiredHeadersRule>
 	{
 		protected override HttpRequiredHeadersRule CreateRule() => new HttpRequiredHeadersRule();
 
