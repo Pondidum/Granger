@@ -15,7 +15,7 @@ namespace Granger.ResponseHeaderValidation
 				Message = "The response was missing a recommend header: " + header,
 				Links = new Dictionary<string, HrefWrapper>
 				{
-					{ "rfc", new HrefWrapper { Href = rfcUri } }
+					{ "rfc", HrefWrapper.From(rfcUri) }
 				}
 			};
 		}

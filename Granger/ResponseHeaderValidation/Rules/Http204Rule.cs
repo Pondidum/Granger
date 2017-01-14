@@ -17,7 +17,7 @@ namespace Granger.ResponseHeaderValidation.Rules
 						Message = "The Content-Length header should not be set when returning 204: No Content",
 						Links = new Dictionary<string, HrefWrapper>
 						{
-							{ "rfc", new HrefWrapper { Href = new Uri("http://tools.ietf.org/html/rfc7231#section-6.3.5") }}
+							{ "rfc", HrefWrapper.From("http://tools.ietf.org/html/rfc7231#section-6.3.5") }
 						}
 					};
 
@@ -29,7 +29,7 @@ namespace Granger.ResponseHeaderValidation.Rules
 						Message = "There should not be any content when returning 204: No Content",
 						Links = new Dictionary<string, HrefWrapper>
 						{
-							{ "rfc", new HrefWrapper { Href = new Uri("http://tools.ietf.org/html/rfc7231#section-6.3.5") }}
+							{ "rfc", HrefWrapper.From("http://tools.ietf.org/html/rfc7231#section-6.3.5") }
 						}
 					};
 			}
