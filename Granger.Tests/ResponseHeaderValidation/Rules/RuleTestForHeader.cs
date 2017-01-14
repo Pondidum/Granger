@@ -31,5 +31,15 @@ namespace Granger.Tests.ResponseHeaderValidation.Rules
 
 			Rule.GetViolations(Response).ShouldBeEmpty();
 		}
+
+		[Fact]
+		public void When_called_with_a_different_statuscode()
+		{
+			Before();
+
+			Response.StatusCode++;
+
+			Rule.GetViolations(Response).ShouldBeEmpty();
+		}
 	}
 }
