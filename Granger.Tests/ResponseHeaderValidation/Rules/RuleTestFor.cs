@@ -21,8 +21,16 @@ namespace Granger.Tests.ResponseHeaderValidation.Rules
 			Response.ContentType = Arg.Do<string>(val => Response.Headers["Content-Type"] = val);
 			Response.ContentType.Returns(ci => Response.Headers["Content-Type"]);
 
-			Response.ContentLength = Arg.Do<int>(val => Response.Headers["Content-Type"] = Convert.ToString(val));
-			Response.ContentLength.Returns(ci => int.Parse(Response.Headers["Content-Type"]));
+			Response.ContentLength = Arg.Do<long?>(val => Response.Headers["Content-Length"] = (val == null ? null : Convert.ToString(val)));
+			Response.ContentLength.Returns(ci =>
+			{
+				var val = Response.Headers["Content-Length"];
+
+				if (val == null)
+					return null;
+
+				return long.Parse(val);
+			});
 		}
 
 		protected abstract TRule CreateRule();
