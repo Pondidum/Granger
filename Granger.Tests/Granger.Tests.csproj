@@ -98,6 +98,7 @@
     <Compile Include="ResponseHeaderValidation\Rules\Http101RuleTests.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\Http201RuleTests.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\Http204RuleTests.cs" />
+    <Compile Include="ResponseHeaderValidation\Rules\Http205RuleTests.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\HttpRequiredHeadersRuleTests.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\RuleTestFor.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\RuleTestForHeader.cs" />

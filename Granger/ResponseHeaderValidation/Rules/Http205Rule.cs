@@ -1,10 +1,10 @@
-﻿using Microsoft.Owin;
 using System.Collections.Generic;
 using System.Net;
+using Microsoft.Owin;
 
 namespace Granger.ResponseHeaderValidation.Rules
 {
-	public class Http204Rule : IResponseRule
+	public class Http205Rule : IResponseRule
 	{
 		public IEnumerable<Violation> GetViolations(IOwinResponse response)
 		{
@@ -14,10 +14,10 @@ namespace Granger.ResponseHeaderValidation.Rules
 			if (response.ContentLength != null && response.ContentLength != 0)
 				yield return new Violation
 				{
-					Message = "The Content-Length header should not be set when returning 204: No Content",
+					Message = "The Content-Length header must not be set when returning 205: Reset Content",
 					Links = new Dictionary<string, HrefWrapper>
 					{
-						{ "rfc", HrefWrapper.From("http://tools.ietf.org/html/rfc7231#section-6.3.5") }
+						{ "rfc", HrefWrapper.From("https://tools.ietf.org/html/rfc7231#section-6.3.6") }
 					}
 				};
 
@@ -26,10 +26,10 @@ namespace Granger.ResponseHeaderValidation.Rules
 			if (response.Body != null && response.Body.CanRead && response.Body.Read(buffer, 0, 1) > 0)
 				yield return new Violation
 				{
-					Message = "There should not be any content when returning 204: No Content",
+					Message = "There must not be any content when returning 205: Reset Content",
 					Links = new Dictionary<string, HrefWrapper>
 					{
-						{ "rfc", HrefWrapper.From("http://tools.ietf.org/html/rfc7231#section-6.3.5") }
+						{ "rfc", HrefWrapper.From("https://tools.ietf.org/html/rfc7231#section-6.3.6") }
 					}
 				};
 		}
