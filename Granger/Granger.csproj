@@ -72,6 +72,7 @@
     <Compile Include="ResponseHeaderValidation\Rules\Http201Rule.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\Http204Rule.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\Http205Rule.cs" />
+    <Compile Include="ResponseHeaderValidation\Rules\Http206Rule.cs" />
     <Compile Include="ResponseHeaderValidation\Rules\HttpRequiredHeadersRule.cs" />
     <Compile Include="ResponseHeaderValidation\Violation.cs" />
   </ItemGroup>
